@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import Header from '@/src/components/shared/Header';
 import Footer from '@/src/components/shared/Footer';
 import { toast } from 'sonner';
-import FAQ from '../home/FAQ';
+import FAQ from '@/src/components/home/FAQ';
 
 const subjects = [
   'Pricing',
