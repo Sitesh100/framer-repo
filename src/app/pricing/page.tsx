@@ -87,7 +87,7 @@ const Pricing = () => {
         >
           <Plane className="w-8 h-8 rotate-45" />
         </motion.div>
-      </div>
+      </div> 
 
       <Header />
 
