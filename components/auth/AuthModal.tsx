@@ -193,7 +193,7 @@ const AuthModal = ({ isOpen, onClose, initialView = 'signup' }: AuthModalProps) 
                     >
                       <Plane className="w-5 h-5 text-white" />
                     </div>
-                    <span className="text-xl font-serif font-bold text-white">TravelMax</span>
+                    <span className="text-xl font-serif font-bold text-white">Onlyy</span>
                   </div>
 
                   {/* Bottom content */}

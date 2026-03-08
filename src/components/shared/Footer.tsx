@@ -75,7 +75,7 @@ const Footer = () => {
               className="text-3xl font-serif font-bold bg-clip-text text-transparent"
               style={{ backgroundImage: 'linear-gradient(135deg, #2563eb 0%, #0891b2 100%)' }}
             >
-              TravelMax
+              Onlyy
             </span>
           </div>
         </motion.div>
@@ -147,13 +147,13 @@ const Footer = () => {
             </h4>
             <div className="space-y-4 text-sm">
               <a 
-                href="mailto:hello@travelmax.com" 
+                href="mailto:hello@Onlyy.com" 
                 className="flex items-center gap-3 text-gray-600 hover:text-blue-600 transition-colors duration-200 group"
               >
                 <div className="w-8 h-8 bg-blue-100 group-hover:bg-blue-200 rounded-lg flex items-center justify-center transition-colors">
                   <Mail className="w-4 h-4 text-blue-600" />
                 </div>
-                hello@travelmax.com
+                hello@Onlyy.com
               </a>
               <a 
                 href="tel:+1234567890" 
@@ -231,7 +231,7 @@ const Footer = () => {
             </a>
             <span className="text-gray-300">|</span>
             <span className="text-gray-400">
-              © {new Date().getFullYear()} TravelMax. All rights reserved.
+              © {new Date().getFullYear()} Onlyy. All rights reserved.
             </span>
           </div>
         </motion.div>

@@ -74,7 +74,7 @@ const Header = () => {
                   className="text-xl lg:text-2xl font-serif font-bold bg-clip-text text-transparent"
                   style={{ backgroundImage: 'linear-gradient(135deg, #2563eb 0%, #0891b2 100%)' }}
                 >
-                  TravelMax
+                  Onlyy
                 </span>
               </a>
 

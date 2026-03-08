@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { 
   ArrowRight, 
   Plane, 
-  Train, 
+  FileCheck, 
   Building2, 
   MapPin, 
   Calendar,
@@ -24,11 +24,12 @@ import Image from 'next/image';
 import testimonial1 from '@/src/app/assets/testimonial-1.jpg';
 import testimonial2 from '@/src/app/assets/testimonial-2.jpg';
 import testimonial3 from '@/src/app/assets/testimonial-3.jpg';
+import  {TripTypeDropdown} from './TripTypeDropdown';
 
 const tabs = [
   { id: 'flights', label: 'Flights', icon: Plane },
   { id: 'hotels', label: 'Hotels', icon: Building2 },
-  { id: 'trains', label: 'Trains', icon: Train },
+  { id: 'visa', label: 'Visa', icon: FileCheck },
   { id: 'packages', label: 'Packages', icon: MapPin },
 ];
 
@@ -183,7 +184,7 @@ const Hero = () => {
             </span>
           </h1>
           <p className="text-lg md:text-xl text-white/70 max-w-2xl mx-auto">
-            Compare flights, hotels, trains & tour packages from 500+ providers. 
+            Compare flights, hotels, visas & tour packages from 500+ providers. 
             Save up to <span className="text-cyan-400 font-semibold">40%</span> on your next adventure.
           </p>
         </motion.div>
@@ -199,6 +200,9 @@ const Hero = () => {
         >
           <div className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl shadow-black/20 p-3 md:p-4">
             {/* Tabs */}
+            <div className="flex items-center gap-2 mb-4 px-2">
+  <TripTypeDropdown />
+</div>
             <div className="flex gap-1 mb-4 bg-gray-100 rounded-2xl p-1.5">
               {tabs.map((tab) => {
                 const Icon = tab.icon;
@@ -236,8 +240,8 @@ const Hero = () => {
                 </div>
               </div>
 
-              {/* Swap Button (for flights/trains) */}
-              {(activeTab === 'flights' || activeTab === 'trains') && (
+              {/* Swap Button (for flights) */}
+              {activeTab === 'flights' && (
                 <div className="hidden md:flex md:col-span-1 items-end justify-center pb-3">
                   <motion.button 
                     whileHover={{ rotate: 180 }}
@@ -251,7 +255,7 @@ const Hero = () => {
               )}
 
               {/* To */}
-              <div className={`${(activeTab === 'flights' || activeTab === 'trains') ? 'md:col-span-3' : 'md:col-span-4'} relative`}>
+              <div className={`${activeTab === 'flights' ? 'md:col-span-3' : 'md:col-span-4'} relative`}>
                 <label className="text-xs font-medium text-gray-500 mb-1.5 block">
                   {activeTab === 'hotels' ? 'Destination' : 'To'}
                 </label>
