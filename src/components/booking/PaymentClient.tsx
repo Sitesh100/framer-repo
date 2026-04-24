@@ -229,7 +229,7 @@ export default function PaymentClient() {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={handleRedirectHome}
-              className="w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold py-4 rounded-lg transition-all shadow-md"
+              className="w-full bg-gradient-button hover:brightness-105 active:brightness-95 text-white font-semibold py-4 rounded-lg transition-all shadow-md"
             >
               Back to Home
             </motion.button>
@@ -288,12 +288,12 @@ export default function PaymentClient() {
                           onClick={() => setSelectedPayment(method.id)}
                           className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2 ${
                             selectedPayment === method.id
-                              ? 'border-blue-600 bg-blue-50'
+                              ? 'border-cyan-500 bg-cyan-50'
                               : 'border-gray-200 bg-white hover:border-gray-300'
                           }`}
                         >
-                          <Icon className={`w-6 h-6 ${selectedPayment === method.id ? 'text-blue-600' : 'text-gray-600'}`} />
-                          <span className={`text-xs font-semibold ${selectedPayment === method.id ? 'text-blue-600' : 'text-slate-900'}`}>
+                          <Icon className={`w-6 h-6 ${selectedPayment === method.id ? 'text-cyan-700' : 'text-gray-600'}`} />
+                          <span className={`text-xs font-semibold ${selectedPayment === method.id ? 'text-cyan-700' : 'text-slate-900'}`}>
                             {method.name}
                           </span>
                         </motion.button>
@@ -416,7 +416,7 @@ export default function PaymentClient() {
                         else if (selectedPayment === 'upi') handleUPIPayment();
                         else handleWalletPayment();
                       }}
-                      className="w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold py-3 rounded-lg transition-all"
+                      className="w-full bg-gradient-button hover:brightness-105 active:brightness-95 text-white font-semibold py-3 rounded-lg transition-all"
                     >
                       Continue to Pay ₹{totalAmount}
                     </button>
@@ -472,7 +472,7 @@ export default function PaymentClient() {
                   <div className="mt-6">
                     <button
                       onClick={handleOTPVerification}
-                      className="w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold py-3 rounded-lg transition-all"
+                      className="w-full bg-gradient-button hover:brightness-105 active:brightness-95 text-white font-semibold py-3 rounded-lg transition-all"
                     >
                       Verify & Pay
                     </button>

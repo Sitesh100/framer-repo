@@ -55,6 +55,28 @@ const CITIES = [
   'Vijayawada (Andhra Pradesh)', 'Visakhapatnam (Andhra Pradesh)'
 ];
 
+const FLIGHT_LOCATIONS = [
+  { city: 'Delhi', country: 'India', airport: 'Indira Gandhi International Airport', code: 'DEL' },
+  { city: 'Mumbai', country: 'India', airport: 'Chhatrapati Shivaji Maharaj International Airport', code: 'BOM' },
+  { city: 'Bengaluru', country: 'India', airport: 'Kempegowda International Airport', code: 'BLR' },
+  { city: 'Hyderabad', country: 'India', airport: 'Rajiv Gandhi International Airport', code: 'HYD' },
+  { city: 'Chennai', country: 'India', airport: 'Chennai International Airport', code: 'MAA' },
+  { city: 'Kolkata', country: 'India', airport: 'Netaji Subhas Chandra Bose International Airport', code: 'CCU' },
+  { city: 'Goa', country: 'India', airport: 'Manohar International Airport', code: 'GOX' },
+  { city: 'Patna', country: 'India', airport: 'Jay Prakash Narayan International Airport', code: 'PAT' },
+  { city: 'Dubai', country: 'UAE', airport: 'Dubai International Airport', code: 'DXB' },
+  { city: 'Singapore', country: 'Singapore', airport: 'Changi Airport', code: 'SIN' },
+  { city: 'London', country: 'United Kingdom', airport: 'Heathrow Airport', code: 'LHR' },
+  { city: 'Paris', country: 'France', airport: 'Charles de Gaulle Airport', code: 'CDG' },
+  { city: 'New York', country: 'United States', airport: 'John F. Kennedy International Airport', code: 'JFK' },
+];
+
+interface SuggestionItem {
+  value: string;
+  title: string;
+  subtitle: string;
+}
+
 const tabs = [
   { id: 'bus', label: 'Bus', icon: Bus },
   { id: 'flights', label: 'Flights', icon: Plane },
@@ -75,30 +97,64 @@ interface CityInputProps {
   onChange: (val: string) => void;
   placeholder?: string;
   icon: React.ElementType; 
+  mode?: 'bus' | 'flights';
 }
 
-function CityInput({ label, value, onChange, placeholder = 'Select city', icon: Icon }: CityInputProps) {
-  const [suggestions, setSuggestions] = useState<string[]>([]);
+function CityInput({
+  label,
+  value,
+  onChange,
+  placeholder = 'Select city',
+  icon: Icon,
+  mode = 'bus',
+}: CityInputProps) {
+  const [suggestions, setSuggestions] = useState<SuggestionItem[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
+
+  const getSuggestions = (query: string): SuggestionItem[] => {
+    const q = query.trim().toLowerCase();
+    if (mode === 'flights') {
+      return FLIGHT_LOCATIONS.filter((item) => {
+        if (!q) return true;
+        return (
+          item.city.toLowerCase().includes(q) ||
+          item.country.toLowerCase().includes(q) ||
+          item.airport.toLowerCase().includes(q) ||
+          item.code.toLowerCase().includes(q)
+        );
+      })
+        .slice(0, 6)
+        .map((item) => ({
+          value: `${item.city} (${item.code})`,
+          title: `${item.city} (${item.code})`,
+          subtitle: `${item.airport}, ${item.country}`,
+        }));
+    }
+
+    return CITIES.filter((c) => c.toLowerCase().includes(q))
+      .slice(0, 6)
+      .map((city) => {
+        const [cityName, statePart] = city.split(' (');
+        const state = statePart ? statePart.replace(')', '') : '';
+        return {
+          value: city,
+          title: cityName,
+          subtitle: state,
+        };
+      });
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
     onChange(val);
-    if (val.trim().length > 0) {
-      const filtered = CITIES.filter(c =>
-        c.toLowerCase().includes(val.toLowerCase())
-      ).slice(0, 5);
-      setSuggestions(filtered);
-      setShowDropdown(filtered.length > 0);
-    } else {
-      setSuggestions([]);
-      setShowDropdown(false);
-    }
+    const filtered = getSuggestions(val);
+    setSuggestions(filtered);
+    setShowDropdown(filtered.length > 0 && (mode === 'flights' || val.trim().length > 0));
   };
 
-  const handleSelect = (city: string) => {
-    onChange(city);
+  const handleSelect = (item: SuggestionItem) => {
+    onChange(item.value);
     setSuggestions([]);
     setShowDropdown(false);
   };
@@ -113,7 +169,10 @@ function CityInput({ label, value, onChange, placeholder = 'Select city', icon: 
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
-  const stateName = value.includes('(') ? value.split('(')[1]?.replace(')', '') : '';
+  const selectedItem = getSuggestions(value).find((s) => s.value === value);
+  const stateName = mode === 'flights'
+    ? selectedItem?.subtitle || ''
+    : value.includes('(') ? value.split('(')[1]?.replace(')', '') : '';
 
   return (
     <div ref={wrapperRef} className="relative flex-1 min-w-0 w-full">
@@ -125,7 +184,9 @@ function CityInput({ label, value, onChange, placeholder = 'Select city', icon: 
           value={value}
           onChange={handleChange}
           onFocus={() => {
-            if (suggestions.length > 0) setShowDropdown(true);
+            const filtered = getSuggestions(value);
+            setSuggestions(filtered);
+            if (filtered.length > 0) setShowDropdown(true);
           }}
           autoComplete="off"
           className="bg-transparent outline-none text-[15px] font-bold text-slate-900 placeholder:text-gray-300 w-full leading-tight"
@@ -144,19 +205,18 @@ function CityInput({ label, value, onChange, placeholder = 'Select city', icon: 
             // Fix: w-max & min-w-[280px] added so it takes full length to show big city/state names
             className="absolute top-full left-0 w-max min-w-[280px] bg-white border border-blue-100 rounded-2xl shadow-2xl z-[100] overflow-hidden mt-2"
           >
-            {suggestions.map((city, idx) => {
-              const [cityName, state] = city.split(' (');
+            {suggestions.map((item, idx) => {
               return (
                 <button
                   key={idx}
-                  onMouseDown={() => handleSelect(city)}
+                  onMouseDown={() => handleSelect(item)}
                   className="w-full flex items-center gap-3 px-4 py-3 hover:bg-blue-50 transition-colors text-left border-b border-gray-100 last:border-0"
                 >
                   <Icon className="w-4 h-4 text-blue-400 flex-shrink-0" />
                   {/* Fix: flex-col makes the state name go to the next line automatically for better visibility */}
                   <div className="flex flex-col">
-                    <span className="text-sm font-bold text-slate-900">{cityName}</span>
-                    {state && <span className="text-[11px] font-medium text-gray-500">({state}</span>}
+                    <span className="text-sm font-bold text-slate-900">{item.title}</span>
+                    {item.subtitle && <span className="text-[11px] font-medium text-gray-500">{item.subtitle}</span>}
                   </div>
                 </button>
               );
@@ -192,6 +252,11 @@ const Hero = () => {
   };
 
   const handleSearch = () => {
+    if (activeTab === 'visa') {
+      router.push('/visa');
+      return;
+    }
+
     if (fromCity && toCity && departDate) {
       const searchParams = new URLSearchParams({ type: activeTab, from: fromCity, to: toCity, date: departDate });
       router.push(`/search?${searchParams.toString()}`);
@@ -298,7 +363,7 @@ const Hero = () => {
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
                     className={`flex items-center justify-center gap-2 py-2 px-6 rounded-xl text-sm font-semibold transition-all duration-300 ${
-                      activeTab === tab.id ? 'bg-blue-600 text-white shadow-md' : 'text-gray-500 hover:text-gray-700 hover:bg-white/50'
+                      activeTab === tab.id ? 'bg-gradient-button text-white shadow-md' : 'text-gray-500 hover:text-gray-700 hover:bg-white/50'
                     }`}
                   >
                     <Icon className="w-4 h-4" />
@@ -314,14 +379,21 @@ const Hero = () => {
               {/* FROM */}
               <div className="flex items-center flex-1 min-w-0 border-b lg:border-b-0 lg:border-r border-blue-100 relative">
                 <ActiveIcon className="w-4 h-4 text-blue-400 ml-4 flex-shrink-0 hidden sm:block" />
-                <CityInput label="From" value={fromCity} onChange={setFromCity} icon={ActiveIcon} />
+                <CityInput
+                  label="From"
+                  value={fromCity}
+                  onChange={setFromCity}
+                  icon={ActiveIcon}
+                  mode={activeTab === 'flights' ? 'flights' : 'bus'}
+                  placeholder={activeTab === 'flights' ? 'Search city, airport or country' : 'Select city'}
+                />
               </div>
 
               {/* SWAP */}
               {(activeTab === 'flights' || activeTab === 'bus') && (
                 <button
                   onClick={() => { const t = fromCity; setFromCity(toCity); setToCity(t); }}
-                  className="w-full lg:w-10 h-10 lg:h-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 flex items-center justify-center flex-shrink-0 transition-colors"
+                  className="w-full lg:w-10 h-10 lg:h-full bg-gradient-button hover:brightness-105 active:brightness-95 flex items-center justify-center flex-shrink-0 transition-all"
                 >
                   <ArrowLeftRight className="w-4 h-4 text-white rotate-90 lg:rotate-0" />
                 </button>
@@ -330,7 +402,14 @@ const Hero = () => {
               {/* TO */}
               <div className="flex items-center flex-1 min-w-0 border-b lg:border-b-0 lg:border-x border-blue-100 relative">
                 <ActiveIcon className="w-4 h-4 text-blue-400 ml-4 flex-shrink-0 hidden sm:block" />
-                <CityInput label="To" value={toCity} onChange={setToCity} icon={ActiveIcon} />
+                <CityInput
+                  label="To"
+                  value={toCity}
+                  onChange={setToCity}
+                  icon={ActiveIcon}
+                  mode={activeTab === 'flights' ? 'flights' : 'bus'}
+                  placeholder={activeTab === 'flights' ? 'Search city, airport or country' : 'Select city'}
+                />
               </div>
 
               {/* DATE */}
@@ -363,7 +442,7 @@ const Hero = () => {
                 <button
                   onClick={handleTomorrowClick}
                   className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors ${
-                    selectedDateType === 'tomorrow' ? 'bg-blue-600 text-white font-semibold' : 'text-gray-600 hover:bg-gray-100'
+                    selectedDateType === 'tomorrow' ? 'bg-gradient-button text-white font-semibold' : 'text-gray-600 hover:bg-gray-100'
                   }`}
                 >
                   Tomorrow
@@ -373,7 +452,7 @@ const Hero = () => {
               {/* Search Button Inline */}
               <button
                 onClick={handleSearch}
-                className="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white py-4 lg:py-0 px-8 flex items-center justify-center gap-2 flex-shrink-0 transition-colors font-bold text-sm rounded-bl-xl rounded-br-xl lg:rounded-bl-none lg:rounded-tr-xl lg:rounded-br-xl shadow-sm"
+                className="bg-gradient-button hover:brightness-105 active:brightness-95 text-white py-4 lg:py-0 px-8 flex items-center justify-center gap-2 flex-shrink-0 transition-all font-bold text-sm rounded-bl-xl rounded-br-xl lg:rounded-bl-none lg:rounded-tr-xl lg:rounded-br-xl shadow-sm"
               >
                 <Search className="w-4 h-4" />
                 <span>Search</span>

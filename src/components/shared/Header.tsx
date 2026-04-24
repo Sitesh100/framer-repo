@@ -5,11 +5,12 @@ import { Button } from '@/components/ui/button';
 import { Menu, X, Plane, UserPlus } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import AuthModal from '@/components/auth/AuthModal';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 const navLinks = [
-  { name: 'Bus', href: '/search?type=bus' },
-  { name: 'Flights', href: '/search?type=flights' },
-  { name: 'Visas', href: '/search?type=visa' },
+  { name: 'Home', href: '/' },
+  { name: 'Visas', href: '/visa' },
   { name: 'Pricing', href: '/pricing' },
   { name: 'Contact', href: '/contact' },
 ];
@@ -19,6 +20,7 @@ const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authModalView, setAuthModalView] = useState<'login' | 'signup'>('signup');
+  const pathname = usePathname();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -36,6 +38,10 @@ const Header = () => {
   const openLogin = () => {
     setAuthModalView('login');
     setIsAuthModalOpen(true);
+  };
+
+  const isLinkActive = (href: string) => {
+    return pathname === href;
   };
 
   return (
@@ -60,7 +66,7 @@ const Header = () => {
           <div className="px-4 lg:px-6">
             <div className="flex items-center justify-between h-14 lg:h-16">
               {/* Logo */}
-              <a href="/" className="flex items-center gap-2.5 group">
+              <Link href="/" className="flex items-center gap-2.5 group">
                 <motion.div
                   whileHover={{ rotate: 15, scale: 1.05 }}
                   transition={{ type: 'spring', stiffness: 300 }}
@@ -75,19 +81,25 @@ const Header = () => {
                 >
                   Onlyy
                 </span>
-              </a>
+              </Link>
 
               {/* Desktop Navigation */}
               <nav className="hidden lg:flex items-center gap-1">
-                {navLinks.map((link) => (
-                  <a
+                {navLinks.map((link) => {
+                  const active = isLinkActive(link.href);
+                  return (
+                  <Link
                     key={link.name}
                     href={link.href}
-                    className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors duration-200 rounded-lg hover:bg-blue-50"
+                    className={`px-4 py-2 text-sm font-medium transition-colors duration-200 rounded-lg ${
+                      active
+                        ? 'text-blue-700 bg-blue-100'
+                        : 'text-gray-600 hover:text-blue-600 hover:bg-blue-50'
+                    }`}
                   >
                     {link.name}
-                  </a>
-                ))}
+                  </Link>
+                )})}
               </nav>
 
               {/* Auth Buttons */}
@@ -130,19 +142,30 @@ const Header = () => {
                 className="lg:hidden overflow-hidden border-t border-gray-100"
               >
                 <nav className="px-4 py-4 flex flex-col gap-1 bg-white rounded-b-2xl">
-                  {navLinks.map((link, index) => (
-                    <motion.a
+                  {navLinks.map((link, index) => {
+                    const active = isLinkActive(link.href);
+                    return (
+                    <motion.div
                       key={link.name}
-                      href={link.href}
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: 0.05 * index }}
-                      className="text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200 py-3 px-4 rounded-xl"
-                      onClick={() => setIsMenuOpen(false)}
                     >
-                      {link.name}
-                    </motion.a>
-                  ))}
+                      <Link
+                        href={link.href}
+                        className={`block text-sm font-medium transition-all duration-200 py-3 px-4 rounded-xl ${
+                          active
+                            ? 'text-blue-700 bg-blue-100'
+                            : 'text-gray-700 hover:text-blue-600 hover:bg-blue-50'
+                        }`}
+                        onClick={() => {
+                          setIsMenuOpen(false);
+                        }}
+                      >
+                        {link.name}
+                      </Link>
+                    </motion.div>
+                  )})}
                   <div className="mt-3 pt-3 border-t border-gray-100 space-y-2">
                     <Button 
                       variant="outline"

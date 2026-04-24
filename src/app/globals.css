@@ -194,11 +194,11 @@
 @layer utilities {
   /* Font Families */
   .font-serif {
-    font-family: 'Playfair Display', Georgia, serif;
+    font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   }
 
   .font-sans {
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   }
 
   /* ----------------------------------------

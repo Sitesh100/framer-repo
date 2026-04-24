@@ -238,13 +238,13 @@ export default function BookingConfirmation({
                       className={`
                         p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2
                         ${selectedPayment === method.id
-                          ? 'border-blue-600 bg-blue-50'
+                          ? 'border-cyan-500 bg-cyan-50'
                           : 'border-gray-200 bg-white hover:border-gray-300'
                         }
                       `}
                     >
-                      <Icon className={`w-6 h-6 ${selectedPayment === method.id ? 'text-blue-600' : 'text-gray-600'}`} />
-                      <span className={`text-xs font-semibold text-center ${selectedPayment === method.id ? 'text-blue-600' : 'text-slate-900'}`}>
+                      <Icon className={`w-6 h-6 ${selectedPayment === method.id ? 'text-cyan-700' : 'text-gray-600'}`} />
+                      <span className={`text-xs font-semibold text-center ${selectedPayment === method.id ? 'text-cyan-700' : 'text-slate-900'}`}>
                         {method.name}
                       </span>
                       {selectedPayment === method.id && (
@@ -357,7 +357,7 @@ export default function BookingConfirmation({
                         whileTap={{ scale: 0.95 }}
                         onClick={handleApplyPromo}
                         disabled={!promoCode}
-                        className="px-3 py-2 bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                        className="px-3 py-2 bg-gradient-button text-white rounded-lg text-sm font-semibold hover:brightness-105 active:brightness-95 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
                       >
                         Apply
                       </motion.button>
@@ -420,7 +420,7 @@ export default function BookingConfirmation({
                 className={`
                   w-full py-3 rounded-lg font-bold transition-all text-white
                   ${termsAccepted
-                    ? 'bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800'
+                    ? 'bg-gradient-button hover:brightness-105 active:brightness-95'
                     : 'bg-gray-300 cursor-not-allowed'
                   }
                 `}
