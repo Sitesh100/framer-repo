@@ -13,12 +13,7 @@ export default function SearchPageContent() {
 
   return (
     <div>
-      {/* Your component logic here */}
-      <h1>Search Results</h1>
-      <p>Type: {type}</p>
-      <p>From: {from}</p>
-      <p>To: {to}</p>
-      <p>Date: {date}</p>
+      <SearchResults />
     </div>
   );
 }
