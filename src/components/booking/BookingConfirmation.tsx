@@ -13,9 +13,9 @@ import {
   Wallet,
   AlertCircle,
   CheckCircle2,
-  X,
-  Plus
+  X
 } from 'lucide-react';
+import Header from '@/components/shared/Header';
 
 interface PassengerInfo {
   name: string;
@@ -89,7 +89,8 @@ export default function BookingConfirmation({
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white pt-6 pb-16">
-      <div className="max-w-6xl mx-auto px-4 lg:px-8">
+      <Header />
+      <div className="max-w-6xl mx-auto px-4 lg:px-8 pt-24">
         {/* Header */}
         <div className="mb-8">
           <button

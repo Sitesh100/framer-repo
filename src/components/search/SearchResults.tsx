@@ -6,10 +6,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   MapPin, Calendar, ArrowLeftRight, Search, ChevronDown, ChevronUp,
   Wifi, Zap, Coffee, Tv, Wind, Star, Clock, CheckCircle2,
-  X, ArrowLeft, ShieldCheck, Bus,
+  ArrowLeft, ShieldCheck, Bus,
   SlidersHorizontal, ChevronRight,
 } from 'lucide-react';
 import Header from '@/components/shared/Header'; 
+import BusDetailsModal from '@/components/search/BusDetailsModal';
 
 // ── Types ─────────────────────────────────────────────────────
 interface BusResult {
@@ -377,86 +378,45 @@ function BusCard({ bus, onBook }: { bus: BusResult; onBook: (b: BusResult) => vo
 }
 
 // ── Seat Modal ────────────────────────────────────────────────
-function SeatModal({ bus, onClose }: { bus: BusResult; onClose: () => void }) {
-  const [selected, setSelected] = useState<number[]>([]);
-  const booked = [3, 7, 12, 15, 22, 25];
-  const total = selected.length * bus.ourPrice;
-
-  const toggle = (n: number) => {
-    if (booked.includes(n)) return;
-    setSelected(prev => prev.includes(n) ? prev.filter(s => s !== n) : [...prev, n]);
-  };
+function SeatModal({
+  bus,
+  onClose,
+  fromCity,
+  toCity,
+  travelDate,
+}: {
+  bus: BusResult;
+  onClose: () => void;
+  fromCity: string;
+  toCity: string;
+  travelDate: string;
+}) {
+  const discount = Math.max(0, Math.round(((bus.marketPrice - bus.ourPrice) / bus.marketPrice) * 100));
 
   return (
-    <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-[300] p-4">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: 20 }}
-        className="bg-white rounded-3xl w-full max-w-md overflow-hidden shadow-2xl"
-      >
-        <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4 flex items-center justify-between">
-          <div>
-            <h2 className="font-bold text-white">{bus.operator}</h2>
-            <p className="text-blue-200 text-xs mt-0.5">{bus.departure} → {bus.arrival} · {bus.duration}</p>
-          </div>
-          <button onClick={onClose} className="p-2 bg-white/20 hover:bg-white/30 rounded-xl transition-colors">
-            <X className="w-4 h-4 text-white" />
-          </button>
-        </div>
-
-        <div className="p-5">
-          <div className="flex gap-4 mb-4 text-[11px] text-gray-500">
-            <div className="flex items-center gap-1.5"><div className="w-5 h-5 border-2 border-blue-200 rounded-lg" /> Available</div>
-            <div className="flex items-center gap-1.5"><div className="w-5 h-5 bg-blue-600 rounded-lg" /> Selected</div>
-            <div className="flex items-center gap-1.5"><div className="w-5 h-5 bg-gray-200 rounded-lg" /> Booked</div>
-          </div>
-
-          <div className="bg-blue-50 rounded-2xl p-4 mb-4">
-            <div className="flex items-center justify-between mb-3">
-              <div className="bg-slate-600 text-white text-[10px] font-bold px-3 py-1 rounded-lg">DRIVER</div>
-              <Bus className="w-5 h-5 text-blue-300" />
-            </div>
-            <div className="grid grid-cols-4 gap-2">
-              {Array.from({ length: 24 }, (_, i) => i + 1).map(n => {
-                const isBooked = booked.includes(n);
-                const isSel = selected.includes(n);
-                return (
-                  <button key={n} onClick={() => toggle(n)} disabled={isBooked}
-                    className={`h-9 w-full rounded-lg text-xs font-bold transition-all
-                      ${isBooked ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                        : isSel ? 'bg-blue-600 text-white shadow-md shadow-blue-200 scale-105'
-                        : 'bg-white border-2 border-blue-200 text-slate-700 hover:border-blue-500'}`}>
-                    {n}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {selected.length > 0 && (
-            <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}
-              className="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 mb-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-semibold text-slate-900">Seat{selected.length > 1 ? 's' : ''} {selected.join(', ')}</p>
-                  <p className="text-xs text-gray-500 mt-0.5">{selected.length} × ₹{bus.ourPrice}</p>
-                </div>
-                <div className="text-right">
-                  <p className="text-xl font-bold text-blue-600">₹{total}</p>
-                </div>
-              </div>
-            </motion.div>
-          )}
-
-          <button
-            disabled={selected.length === 0}
-            className="w-full bg-blue-600 disabled:bg-gray-200 disabled:text-gray-400 hover:bg-blue-700 active:bg-blue-800 text-white font-bold py-3.5 rounded-2xl transition-all text-sm shadow-sm"
-          >
-            {selected.length > 0 ? `Continue to Pay → ₹${total}` : 'Select a seat to continue'}
-          </button>
-        </div>
-      </motion.div>
-    </div>
+    <BusDetailsModal
+      onClose={onClose}
+      bus={{
+        id: bus.id,
+        name: bus.operator,
+        rating: bus.rating,
+        reviews: bus.reviews,
+        departure: bus.departure,
+        arrival: bus.arrival,
+        duration: bus.duration,
+        originalPrice: bus.marketPrice,
+        discountedPrice: bus.ourPrice,
+        discount,
+        seats: bus.availableSeats,
+        amenities: bus.amenities,
+        bookingDate: travelDate,
+        saleWindow: 'Limited offer',
+        fromCity,
+        toCity,
+        boardingPoints: bus.boardingPoints,
+        droppingPoints: bus.droppingPoints,
+      }}
+    />
   );
 }
 
@@ -576,67 +536,69 @@ function SearchResultsContent() {
 
   return (
     <>
-      <Header />
+      {!selectedBus && <Header />}
 
       {/* ── Sticky search bar ── 
           Removed white patch background.
           z-[1000] and top-4 perfectly overrides Navbar when scrolling down!
           mt-[90px] gives it initial margin below header.
       */}
-      <div className="sticky top-4 z-[1000] mt-[110px] mb-6 mt-6">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="flex items-stretch h-[60px] bg-white border border-blue-200 rounded-2xl shadow-xl shadow-blue-500/10">
-            {/* From */}
-            <div className="flex items-center flex-1 min-w-0 border-r border-blue-100">
-              <Bus className="w-4 h-4 text-blue-300 ml-4 flex-shrink-0" />
-              <CityInput label="From" value={fromCity} onChange={setFromCity} />
-            </div>
-            {/* Swap */}
-            <button
-              onClick={() => { const t = fromCity; setFromCity(toCity); setToCity(t); }}
-              className="w-10 bg-blue-600 hover:bg-blue-700 flex items-center justify-center flex-shrink-0 transition-colors"
-            >
-              <ArrowLeftRight className="w-4 h-4 text-white" />
-            </button>
-            {/* To */}
-            <div className="flex items-center flex-1 min-w-0 border-x border-blue-100">
-              <MapPin className="w-4 h-4 text-blue-300 ml-4 flex-shrink-0" />
-              <CityInput label="To" value={toCity} onChange={setToCity} />
-            </div>
-            {/* Date */}
-            <div className="flex items-center gap-2 px-4 border-r border-blue-100 flex-shrink-0">
-              <Calendar className="w-4 h-4 text-blue-400" />
-              <div>
-                <p className="text-[10px] font-bold text-blue-500 uppercase tracking-widest">Date</p>
-                <div className="flex items-center gap-1.5">
-                  <input type="date" value={date} onChange={e => setDate(e.target.value)}
-                    className="text-[13px] font-bold text-slate-900 bg-transparent outline-none" />
-                  {isToday && <span className="text-[10px] text-gray-400">(Today)</span>}
+      {!selectedBus && (
+        <div className="sticky top-4 z-[1000] mt-[110px] mb-6 mt-6">
+          <div className="max-w-6xl mx-auto px-4">
+            <div className="flex items-stretch h-[60px] bg-white border border-blue-200 rounded-2xl shadow-xl shadow-blue-500/10">
+              {/* From */}
+              <div className="flex items-center flex-1 min-w-0 border-r border-blue-100">
+                <Bus className="w-4 h-4 text-blue-300 ml-4 flex-shrink-0" />
+                <CityInput label="From" value={fromCity} onChange={setFromCity} />
+              </div>
+              {/* Swap */}
+              <button
+                onClick={() => { const t = fromCity; setFromCity(toCity); setToCity(t); }}
+                className="w-10 bg-blue-600 hover:bg-blue-700 flex items-center justify-center flex-shrink-0 transition-colors"
+              >
+                <ArrowLeftRight className="w-4 h-4 text-white" />
+              </button>
+              {/* To */}
+              <div className="flex items-center flex-1 min-w-0 border-x border-blue-100">
+                <MapPin className="w-4 h-4 text-blue-300 ml-4 flex-shrink-0" />
+                <CityInput label="To" value={toCity} onChange={setToCity} />
+              </div>
+              {/* Date */}
+              <div className="flex items-center gap-2 px-4 border-r border-blue-100 flex-shrink-0">
+                <Calendar className="w-4 h-4 text-blue-400" />
+                <div>
+                  <p className="text-[10px] font-bold text-blue-500 uppercase tracking-widest">Date</p>
+                  <div className="flex items-center gap-1.5">
+                    <input type="date" value={date} onChange={e => setDate(e.target.value)}
+                      className="text-[13px] font-bold text-slate-900 bg-transparent outline-none" />
+                    {isToday && <span className="text-[10px] text-gray-400">(Today)</span>}
+                  </div>
                 </div>
               </div>
-            </div>
-            {/* Today/Tomorrow */}
-            <div className="hidden sm:flex items-center gap-1.5 px-3 border-r border-blue-100">
-              <button onClick={() => setDate(getTodayDate())}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors ${isToday ? 'bg-blue-100 text-blue-700 font-semibold' : 'text-gray-600 hover:bg-gray-100'}`}>
-                Today
+              {/* Today/Tomorrow */}
+              <div className="hidden sm:flex items-center gap-1.5 px-3 border-r border-blue-100">
+                <button onClick={() => setDate(getTodayDate())}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors ${isToday ? 'bg-blue-100 text-blue-700 font-semibold' : 'text-gray-600 hover:bg-gray-100'}`}>
+                  Today
+                </button>
+                <button onClick={() => setDate(getTomorrowDate())}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors ${isTomorrow ? 'bg-blue-600 text-white font-semibold' : 'text-gray-600 hover:bg-gray-100'}`}>
+                  Tomorrow
+                </button>
+              </div>
+              {/* Search */}
+              <button
+                onClick={() => router.push(`/search?type=bus&from=${fromCity}&to=${toCity}&date=${date}`)}
+                className="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white px-6 flex items-center justify-center gap-2 flex-shrink-0 transition-colors font-bold text-sm rounded-r-xl shadow-sm"
+              >
+                <Search className="w-4 h-4" />
+                <span className="hidden sm:inline">Update</span>
               </button>
-              <button onClick={() => setDate(getTomorrowDate())}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors ${isTomorrow ? 'bg-blue-600 text-white font-semibold' : 'text-gray-600 hover:bg-gray-100'}`}>
-                Tomorrow
-              </button>
             </div>
-            {/* Search */}
-            <button
-              onClick={() => router.push(`/search?type=bus&from=${fromCity}&to=${toCity}&date=${date}`)}
-              className="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white px-6 flex items-center justify-center gap-2 flex-shrink-0 transition-colors font-bold text-sm rounded-r-xl shadow-sm"
-            >
-              <Search className="w-4 h-4" />
-              <span className="hidden sm:inline">Update</span>
-            </button>
           </div>
         </div>
-      </div>
+      )}
 
       {/* ── Page body ─────────────────────────────────────── */}
       <div className="bg-gradient-to-b from-blue-50/40 to-white min-h-screen">
@@ -721,7 +683,15 @@ function SearchResultsContent() {
 
       {/* Seat modal */}
       <AnimatePresence>
-        {selectedBus && <SeatModal bus={selectedBus} onClose={() => setSelectedBus(null)} />}
+        {selectedBus && (
+          <SeatModal
+            bus={selectedBus}
+            onClose={() => setSelectedBus(null)}
+            fromCity={fromCity}
+            toCity={toCity}
+            travelDate={date}
+          />
+        )}
       </AnimatePresence>
     </>
   );

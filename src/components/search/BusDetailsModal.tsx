@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Star, MapPin, Clock, Users, Wifi, MapPin as MapPinIcon, ChevronRight } from 'lucide-react';
+import { X, MapPin as MapPinIcon, ChevronRight } from 'lucide-react';
 
 interface BusDetailsModalProps {
   bus: {
@@ -21,6 +21,10 @@ interface BusDetailsModalProps {
     amenities: string[];
     bookingDate: string;
     saleWindow: string;
+    fromCity: string;
+    toCity: string;
+    boardingPoints: string[];
+    droppingPoints: string[];
   };
   onClose: () => void;
 }
@@ -38,8 +42,25 @@ const seatRows = [
   { row: 10, seatsPerRow: 4 },
 ];
 
+interface Seat {
+  id: number;
+  number: string;
+  row: number;
+  isAvailable: boolean;
+  isSelected: boolean;
+  type: 'sleeper' | 'seater';
+}
+
+interface PassengerFormData {
+  name: string;
+  age: string;
+  gender: string;
+  email: string;
+  seatNumber: string;
+}
+
 const generateSeats = () => {
-  const seats: any[] = [];
+  const seats: Seat[] = [];
   let seatId = 1;
   
   seatRows.forEach((rowData) => {
@@ -65,9 +86,11 @@ type Step = 'seats' | 'boardpoint' | 'passenger';
 export default function BusDetailsModal({ bus, onClose }: BusDetailsModalProps) {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState<Step>('seats');
-  const [seats, setSeats] = useState(generateSeats());
+  const [seats] = useState(generateSeats());
   const [selectedSeats, setSelectedSeats] = useState<string[]>([]);
-  const [passengerData, setPassengerData] = useState<any>({});
+  const [passengerData, setPassengerData] = useState<Record<string, PassengerFormData>>({});
+  const [selectedBoardingPoint, setSelectedBoardingPoint] = useState<string>('');
+  const [selectedDroppingPoint, setSelectedDroppingPoint] = useState<string>('');
 
   const toggleSeatSelection = (seatNumber: string) => {
     setSelectedSeats(prev => 
@@ -78,7 +101,7 @@ export default function BusDetailsModal({ bus, onClose }: BusDetailsModalProps) 
   };
 
   const handlePassengerDataChange = (seatNumber: string, field: string, value: string) => {
-    setPassengerData((prev: any) => ({
+    setPassengerData((prev) => ({
       ...prev,
       [seatNumber]: {
         ...prev[seatNumber],
@@ -91,7 +114,7 @@ export default function BusDetailsModal({ bus, onClose }: BusDetailsModalProps) 
   const handleNextStep = () => {
     if (currentStep === 'seats' && selectedSeats.length > 0) {
       setCurrentStep('boardpoint');
-    } else if (currentStep === 'boardpoint') {
+    } else if (currentStep === 'boardpoint' && selectedBoardingPoint && selectedDroppingPoint) {
       setCurrentStep('passenger');
     }
   };
@@ -124,12 +147,17 @@ export default function BusDetailsModal({ bus, onClose }: BusDetailsModalProps) 
       busName: bus.name,
       busRating: bus.rating,
       busReviews: bus.reviews,
+      from: bus.fromCity,
+      to: bus.toCity,
       departure: bus.departure,
       arrival: bus.arrival,
       duration: bus.duration,
       originalPrice: bus.originalPrice,
       discountedPrice: bus.discountedPrice,
       discount: bus.discount,
+      boardingPoint: selectedBoardingPoint,
+      droppingPoint: selectedDroppingPoint,
+      bookingDate: bus.bookingDate,
       seats: selectedSeats,
       passengers: passengersArray,
       totalPrice: selectedSeats.length * bus.discountedPrice
@@ -308,14 +336,21 @@ export default function BusDetailsModal({ bus, onClose }: BusDetailsModalProps) 
                         Boarding Points
                       </h4>
                       <div className="space-y-4">
-                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                          <div className="font-semibold text-slate-900 mb-1">01:15 AM</div>
-                          <div className="text-sm text-gray-700">IFFCO Chowk, Gurgaon</div>
-                        </div>
-                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                          <div className="font-semibold text-slate-900 mb-1">01:20 AM</div>
-                          <div className="text-sm text-gray-700">Rajeev Chowk, Gurgaon</div>
-                        </div>
+                        {bus.boardingPoints.map((point, idx) => (
+                          <button
+                            key={point}
+                            type="button"
+                            onClick={() => setSelectedBoardingPoint(point)}
+                            className={`w-full text-left rounded-lg p-4 border transition-colors ${
+                              selectedBoardingPoint === point
+                                ? 'bg-blue-100 border-blue-500'
+                                : 'bg-blue-50 border-blue-200 hover:border-blue-300'
+                            }`}
+                          >
+                            <div className="font-semibold text-slate-900 mb-1">Option {idx + 1}</div>
+                            <div className="text-sm text-gray-700">{point}</div>
+                          </button>
+                        ))}
                       </div>
                     </div>
 
@@ -326,14 +361,21 @@ export default function BusDetailsModal({ bus, onClose }: BusDetailsModalProps) 
                         Dropping Points
                       </h4>
                       <div className="space-y-4">
-                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                          <div className="font-semibold text-slate-900 mb-1">06:00 AM</div>
-                          <div className="text-sm text-gray-700">Transport Nagar, Jaipur</div>
-                        </div>
-                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                          <div className="font-semibold text-slate-900 mb-1">06:15 AM</div>
-                          <div className="text-sm text-gray-700">Sindhi Camp Bus Stand, Jaipur</div>
-                        </div>
+                        {bus.droppingPoints.map((point, idx) => (
+                          <button
+                            key={point}
+                            type="button"
+                            onClick={() => setSelectedDroppingPoint(point)}
+                            className={`w-full text-left rounded-lg p-4 border transition-colors ${
+                              selectedDroppingPoint === point
+                                ? 'bg-blue-100 border-blue-500'
+                                : 'bg-blue-50 border-blue-200 hover:border-blue-300'
+                            }`}
+                          >
+                            <div className="font-semibold text-slate-900 mb-1">Option {idx + 1}</div>
+                            <div className="text-sm text-gray-700">{point}</div>
+                          </button>
+                        ))}
                       </div>
                     </div>
                   </div>
@@ -428,16 +470,20 @@ export default function BusDetailsModal({ bus, onClose }: BusDetailsModalProps) 
                   handleNextStep();
                 }
               }}
-              disabled={currentStep === 'seats' && selectedSeats.length === 0}
+              disabled={
+                (currentStep === 'seats' && selectedSeats.length === 0) ||
+                (currentStep === 'boardpoint' && (!selectedBoardingPoint || !selectedDroppingPoint))
+              }
               className={`flex-1 py-3 rounded-lg font-semibold transition-all flex items-center justify-center gap-2 ${
-                (currentStep === 'seats' && selectedSeats.length === 0)
+                ((currentStep === 'seats' && selectedSeats.length === 0) ||
+                (currentStep === 'boardpoint' && (!selectedBoardingPoint || !selectedDroppingPoint)))
                   ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
                   : 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white'
               }`}
             >
               {currentStep === 'passenger' ? (
                 <>
-                  Continue to Payment <ChevronRight className="w-5 h-5" />
+                  Proceed to Payment Methods <ChevronRight className="w-5 h-5" />
                 </>
               ) : (
                 <>

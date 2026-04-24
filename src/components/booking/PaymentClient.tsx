@@ -61,6 +61,7 @@ export default function PaymentClient() {
   if (!bookingData) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white pt-20 pb-16">
+        <Header />
         <div className="max-w-4xl mx-auto px-4 lg:px-8">
           <div className="text-center py-20">
             <motion.div
@@ -145,6 +146,7 @@ export default function PaymentClient() {
 
     return (
       <div className="min-h-screen bg-gradient-to-b from-green-50 to-blue-50 pt-20 pb-16">
+        <Header />
         <div className="max-w-2xl mx-auto px-4 lg:px-8">
           {/* Success Animation */}
           <motion.div
