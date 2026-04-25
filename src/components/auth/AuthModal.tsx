@@ -130,7 +130,7 @@ const AuthModal = ({ isOpen, onClose, initialView = 'signup' }: AuthModalProps) 
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.4 }}
-            className="fixed inset-0 bg-black/70 backdrop-blur-md z-50"
+            className="fixed inset-0 bg-black/70 backdrop-blur-md z-[9999]"
             onClick={onClose}
           />
 
@@ -140,7 +140,7 @@ const AuthModal = ({ isOpen, onClose, initialView = 'signup' }: AuthModalProps) 
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 30 }}
             transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-            className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-[95%] max-w-[900px]"
+            className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-[10000] w-[95%] max-w-[900px]"
           >
             <div className="bg-white rounded-3xl shadow-2xl overflow-hidden flex">
               

@@ -48,27 +48,27 @@ const Contact = () => {
   };
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
-      {/* Hero Background - Blue Theme */}
+    <div className="min-h-screen relative overflow-hidden bg-white">
+      {/* Hero Background - Light Theme */}
       <div 
         className="absolute inset-0 h-[900px]"
-        style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e3a5f 30%, #0c4a6e 60%, #0891b2 100%)' }}
+        style={{ background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 30%, #f1f5f9 60%, #e2e8f0 100%)' }}
       />
       
       {/* Animated Background Elements */}
       <div className="absolute inset-0 h-[900px] overflow-hidden">
         <motion.div 
-          className="absolute top-20 left-10 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl"
+          className="absolute top-20 left-10 w-64 h-64 bg-blue-100/20 rounded-full blur-3xl"
           animate={{ x: [0, 30, 0], y: [0, -20, 0] }}
           transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
         />
         <motion.div 
-          className="absolute top-40 right-20 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl"
+          className="absolute top-40 right-20 w-96 h-96 bg-cyan-100/20 rounded-full blur-3xl"
           animate={{ x: [0, -40, 0], y: [0, 30, 0] }}
           transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
         />
         <motion.div 
-          className="absolute bottom-20 left-1/3 w-80 h-80 bg-teal-500/10 rounded-full blur-3xl"
+          className="absolute bottom-20 left-1/3 w-80 h-80 bg-blue-50/20 rounded-full blur-3xl"
           animate={{ x: [0, 20, 0], y: [0, -30, 0] }}
           transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
         />
@@ -81,9 +81,9 @@ const Contact = () => {
         <motion.span 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="inline-flex items-center gap-2 mb-6 rounded-full border border-white/20 bg-white/10 backdrop-blur-md px-4 py-2 text-sm text-white/90"
+          className="inline-flex items-center gap-2 mb-6 rounded-full border border-slate-200 bg-slate-50 backdrop-blur-md px-4 py-2 text-sm text-slate-700"
         >
-          <Mail className="w-4 h-4 text-cyan-400" />
+          <Mail className="w-4 h-4 text-blue-600" />
           Contact
         </motion.span>
 
@@ -91,7 +91,7 @@ const Contact = () => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="text-4xl md:text-5xl lg:text-6xl font-serif font-bold text-white mb-6"
+          className="text-4xl md:text-5xl lg:text-6xl font-serif font-bold text-slate-900 mb-6"
         >
           Get In Touch With Our Team
         </motion.h1>
@@ -100,7 +100,7 @@ const Contact = () => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="max-w-xl mx-auto text-white/70"
+          className="max-w-xl mx-auto text-slate-600"
         >
           Have questions about our travel deals? We're here to help you plan your perfect getaway.
         </motion.p>
@@ -119,40 +119,40 @@ const Contact = () => {
               className="lg:w-72 space-y-6"
             >
               {/* Email Card */}
-              <div className="rounded-2xl border border-white/15 bg-white/10 backdrop-blur-xl p-6 hover:bg-white/15 transition-all duration-300">
+              <div className="rounded-2xl border border-slate-200 bg-white backdrop-blur-xl p-6 hover:bg-slate-50 transition-all duration-300 shadow-sm">
                 <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4"
                   style={{ background: 'linear-gradient(135deg, #2563eb 0%, #0891b2 100%)' }}
                 >
                   <Mail className="w-6 h-6 text-white" />
                 </div>
-                <h3 className="text-white font-semibold mb-2">Email Us</h3>
-                <p className="text-white/60 text-sm mb-4">
+                <h3 className="text-slate-900 font-semibold mb-2">Email Us</h3>
+                <p className="text-slate-600 text-sm mb-4">
                   Facing a more technical issue?<br />
                   Need an expert? We're here.
                 </p>
                 <a
                   href="mailto:support@marqo.com"
-                  className="text-cyan-400 hover:text-cyan-300 underline underline-offset-4 transition-colors"
+                  className="text-blue-600 hover:text-blue-700 underline underline-offset-4 transition-colors"
                 >
                   support@marqo.com
                 </a>
               </div>
 
               {/* Sales Card */}
-              <div className="rounded-2xl border border-white/15 bg-white/10 backdrop-blur-xl p-6 hover:bg-white/15 transition-all duration-300">
+              <div className="rounded-2xl border border-slate-200 bg-white backdrop-blur-xl p-6 hover:bg-slate-50 transition-all duration-300 shadow-sm">
                 <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4"
                   style={{ background: 'linear-gradient(135deg, #0891b2 0%, #2563eb 100%)' }}
                 >
                   <Phone className="w-6 h-6 text-white" />
                 </div>
-                <h3 className="text-white font-semibold mb-2">Contact Sales</h3>
-                <p className="text-white/60 text-sm mb-4">
+                <h3 className="text-slate-900 font-semibold mb-2">Contact Sales</h3>
+                <p className="text-slate-600 text-sm mb-4">
                   Questions about custom pricing?<br />
                   Feature picking? We'll handle it.
                 </p>
                 <a
                   href="#"
-                  className="text-cyan-400 hover:text-cyan-300 underline underline-offset-4 transition-colors"
+                  className="text-blue-600 hover:text-blue-700 underline underline-offset-4 transition-colors"
                 >
                   Book a call with sales
                 </a>
@@ -164,70 +164,70 @@ const Contact = () => {
               initial={{ opacity: 0, x: 30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.4 }}
-              className="flex-1 rounded-3xl border border-white/15 bg-white/10 backdrop-blur-xl p-8"
+              className="flex-1 rounded-3xl border border-slate-200 bg-white backdrop-blur-xl p-8 shadow-sm"
             >
-              <h3 className="text-2xl font-serif font-bold text-white mb-1">
+              <h3 className="text-2xl font-serif font-bold text-slate-900 mb-1">
                 We'd Love To Answer Your Questions
               </h3>
-              <p className="text-white/60 mb-8">
+              <p className="text-slate-600 mb-8">
                 Send us a message and we'll get back to you as soon as possible
               </p>
 
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
-                    <label className="text-xs font-medium text-white/70 mb-1.5 block">First Name</label>
+                    <label className="text-xs font-medium text-slate-700 mb-1.5 block">First Name</label>
                     <input
                       placeholder="John"
                       value={formData.name}
                       onChange={(e) => setFormData({...formData, name: e.target.value})}
-                      className="w-full rounded-xl bg-white/10 border border-white/20 px-4 py-3 text-white placeholder:text-white/40 outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 transition-all duration-200"
+                      className="w-full rounded-xl bg-slate-50 border border-slate-200 px-4 py-3 text-slate-900 placeholder:text-slate-400 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20 transition-all duration-200"
                     />
                   </div>
                   <div>
-                    <label className="text-xs font-medium text-white/70 mb-1.5 block">Last Name</label>
+                    <label className="text-xs font-medium text-slate-700 mb-1.5 block">Last Name</label>
                     <input
                       placeholder="Doe"
                       value={formData.surname}
                       onChange={(e) => setFormData({...formData, surname: e.target.value})}
-                      className="w-full rounded-xl bg-white/10 border border-white/20 px-4 py-3 text-white placeholder:text-white/40 outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 transition-all duration-200"
+                      className="w-full rounded-xl bg-slate-50 border border-slate-200 px-4 py-3 text-slate-900 placeholder:text-slate-400 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20 transition-all duration-200"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="text-xs font-medium text-white/70 mb-1.5 block">Email</label>
+                  <label className="text-xs font-medium text-slate-700 mb-1.5 block">Email</label>
                   <input
                     type="email"
                     placeholder="john@email.com"
                     value={formData.email}
                     onChange={(e) => setFormData({...formData, email: e.target.value})}
-                    className="w-full rounded-xl bg-white/10 border border-white/20 px-4 py-3 text-white placeholder:text-white/40 outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 transition-all duration-200"
+                    className="w-full rounded-xl bg-slate-50 border border-slate-200 px-4 py-3 text-slate-900 placeholder:text-slate-400 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20 transition-all duration-200"
                   />
                 </div>
 
                 <div>
-                  <label className="text-xs font-medium text-white/70 mb-1.5 block">Subject</label>
+                  <label className="text-xs font-medium text-slate-700 mb-1.5 block">Subject</label>
                   <select 
                     value={formData.subject}
                     onChange={(e) => setFormData({...formData, subject: e.target.value})}
-                    className="w-full rounded-xl bg-white/10 border border-white/20 px-4 py-3 text-white outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 transition-all duration-200 appearance-none cursor-pointer"
+                    className="w-full rounded-xl bg-slate-50 border border-slate-200 px-4 py-3 text-slate-900 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20 transition-all duration-200 appearance-none cursor-pointer"
                   >
-                    <option value="" className="bg-slate-800">Select a subject</option>
+                    <option value="" className="bg-white">Select a subject</option>
                     {subjects.map(subject => (
-                      <option key={subject} value={subject} className="bg-slate-800">{subject}</option>
+                      <option key={subject} value={subject} className="bg-white">{subject}</option>
                     ))}
                   </select>
                 </div>
 
                 <div>
-                  <label className="text-xs font-medium text-white/70 mb-1.5 block">Message</label>
+                  <label className="text-xs font-medium text-slate-700 mb-1.5 block">Message</label>
                   <textarea
                     rows={4}
                     placeholder="Your message..."
                     value={formData.message}
                     onChange={(e) => setFormData({...formData, message: e.target.value})}
-                    className="w-full rounded-xl bg-white/10 border border-white/20 px-4 py-3 text-white placeholder:text-white/40 outline-none resize-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 transition-all duration-200"
+                    className="w-full rounded-xl bg-slate-50 border border-slate-200 px-4 py-3 text-slate-900 placeholder:text-slate-400 outline-none resize-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20 transition-all duration-200"
                   />
                 </div>
 
