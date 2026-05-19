@@ -7,6 +7,8 @@ import { MapPin, Calendar, ArrowLeftRight, Search, ArrowLeft, Bus, Plane, Chevro
 import Header from '@/components/shared/Header';
 import BusSearchResultsView, { type BusResult } from '@/components/search/BusSearchResultsView';
 import FlightSearchResultsView, { type FlightResult } from '@/components/search/FlightSearchResultsView';
+import HotelSearchResultsView from '@/components/search/HotelSearchResultsView';
+import { Building2, Users, ChevronDown } from 'lucide-react';
 
 const busResults: BusResult[] = [
   {
@@ -588,22 +590,37 @@ function SearchResultsContent() {
   const searchParams = useSearchParams();
 
   const currentType = searchParams.get('type') || 'bus';
-  const travelType = currentType === 'flights' ? 'flights' : 'bus';
+  const travelType: 'flights' | 'bus' | 'hotels' =
+    currentType === 'flights' ? 'flights' : currentType === 'hotels' ? 'hotels' : 'bus';
 
   const urlFrom = searchParams.get('from');
   const urlTo = searchParams.get('to');
   const urlDate = searchParams.get('date');
+  const urlDestination = searchParams.get('destination');
+  const urlCheckin = searchParams.get('checkin');
+  const urlCheckout = searchParams.get('checkout');
 
   const [fromCity, setFromCity] = useState(urlFrom || '');
   const [toCity, setToCity] = useState(urlTo || '');
   const [date, setDate] = useState(urlDate || new Date().toISOString().split('T')[0]);
+  const [hotelDest, setHotelDest] = useState(urlDestination || '');
+  const tomorrow = () => {
+    const d = new Date();
+    d.setDate(d.getDate() + 1);
+    return d.toISOString().split('T')[0];
+  };
+  const [checkIn, setCheckIn] = useState(urlCheckin || new Date().toISOString().split('T')[0]);
+  const [checkOut, setCheckOut] = useState(urlCheckout || tomorrow());
   const [isBusModalOpen, setIsBusModalOpen] = useState(false);
 
   useEffect(() => {
     setFromCity(urlFrom || '');
     setToCity(urlTo || '');
     setDate(urlDate || new Date().toISOString().split('T')[0]);
-  }, [currentType, urlFrom, urlTo, urlDate]);
+    setHotelDest(urlDestination || '');
+    setCheckIn(urlCheckin || new Date().toISOString().split('T')[0]);
+    if (urlCheckout) setCheckOut(urlCheckout);
+  }, [currentType, urlFrom, urlTo, urlDate, urlDestination, urlCheckin, urlCheckout]);
 
   const hideTopChrome = travelType === 'bus' && isBusModalOpen;
 
@@ -663,9 +680,9 @@ function SearchResultsContent() {
     <>
       {!hideTopChrome && <Header />}
 
-      {!hideTopChrome && (
+      {!hideTopChrome && travelType !== 'hotels' && (
         <div className="sticky top-4 z-[1000] mt-[110px] mb-6 mt-6">
-          <div className="max-w-6xl mx-auto px-4">
+          <div className="max-w-[1440px] mx-auto px-4 lg:px-6">
             <div className="flex items-stretch h-[60px] bg-white border border-blue-200 rounded-2xl shadow-xl shadow-blue-500/10">
               <div className="flex items-center flex-1 min-w-0 border-r border-blue-100">
                 {travelType === 'flights' ? (
@@ -739,27 +756,112 @@ function SearchResultsContent() {
         </div>
       )}
 
-      <div className="bg-gradient-to-b from-blue-50/40 to-white min-h-screen">
-        <div className="max-w-6xl mx-auto px-4 py-6">
-          <div className="flex items-center gap-3 mb-6">
-            <button
-              onClick={() => router.push('/')}
-              className="p-2 bg-white border border-blue-100 hover:border-blue-300 rounded-xl transition-colors shadow-sm"
-            >
-              <ArrowLeft className="w-4 h-4 text-slate-600" />
-            </button>
-            <div>
-              <h1 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-                {fromName} <ChevronRight className="w-5 h-5 text-blue-400" /> {toName}
-              </h1>
-              <p className="text-sm text-gray-400">
-                {count} {travelType === 'flights' ? 'flights' : 'buses'} · {displayDate}
-              </p>
+      {/* Hotel search top bar — dark navy Skyscanner style */}
+      {!hideTopChrome && travelType === 'hotels' && (
+        <div className="bg-[#0B1F3A] pt-[100px] pb-5">
+          <div className="max-w-[1440px] mx-auto px-4 lg:px-6">
+            <div className="flex flex-col lg:flex-row items-stretch gap-2 lg:gap-2">
+              <div className="flex-1 bg-white rounded-xl px-4 py-2.5 flex flex-col justify-center min-h-[58px]">
+                <span className="text-[11px] font-semibold text-slate-500">Where do you want to stay?</span>
+                <input
+                  type="text"
+                  value={hotelDest}
+                  onChange={(e) => setHotelDest(e.target.value)}
+                  placeholder="City or hotel name"
+                  className="text-[15px] font-semibold text-slate-900 bg-transparent outline-none placeholder:text-slate-400"
+                />
+              </div>
+
+              <div className="flex gap-2 lg:gap-2">
+                <div className="flex-1 lg:w-[140px] bg-white rounded-xl px-4 py-2.5 flex flex-col justify-center">
+                  <span className="text-[11px] font-semibold text-slate-500">Check-in</span>
+                  <input
+                    type="date"
+                    value={checkIn}
+                    onChange={(e) => setCheckIn(e.target.value)}
+                    className="text-[14px] font-semibold text-slate-900 bg-transparent outline-none"
+                  />
+                </div>
+                <div className="flex-1 lg:w-[140px] bg-white rounded-xl px-4 py-2.5 flex flex-col justify-center">
+                  <span className="text-[11px] font-semibold text-slate-500">Check-out</span>
+                  <input
+                    type="date"
+                    value={checkOut}
+                    onChange={(e) => setCheckOut(e.target.value)}
+                    className="text-[14px] font-semibold text-slate-900 bg-transparent outline-none"
+                  />
+                </div>
+              </div>
+
+              <button className="lg:w-[200px] bg-white rounded-xl px-4 py-2.5 flex items-center gap-2 hover:bg-slate-50 transition-colors text-left">
+                <Users className="w-4 h-4 text-slate-400 shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-[11px] font-semibold text-slate-500">Guests and rooms</p>
+                  <p className="text-[14px] font-semibold text-slate-900 truncate">2 adults, 1 room</p>
+                </div>
+                <ChevronDown className="w-4 h-4 text-slate-400 shrink-0" />
+              </button>
+
+              <button
+                onClick={() => router.push(`/search?type=hotels&destination=${encodeURIComponent(hotelDest)}&checkin=${checkIn}&checkout=${checkOut}`)}
+                className="bg-[#0770e3] hover:bg-[#0561c7] text-white px-8 py-3 rounded-xl flex items-center justify-center gap-2 font-bold text-sm transition-colors shadow-lg shadow-[#0770e3]/30 whitespace-nowrap"
+              >
+                <Search className="w-4 h-4" /> Search hotels
+              </button>
             </div>
           </div>
+        </div>
+      )}
+
+      <div className="bg-slate-50 min-h-screen">
+        <div className="max-w-[1440px] mx-auto px-4 lg:px-6 py-6">
+          {travelType !== 'hotels' && (
+            <div className="flex items-center gap-3 mb-6">
+              <button
+                onClick={() => router.push('/')}
+                className="p-2 bg-white border border-blue-100 hover:border-blue-300 rounded-xl transition-colors shadow-sm"
+              >
+                <ArrowLeft className="w-4 h-4 text-slate-600" />
+              </button>
+              <div>
+                <h1 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+                  {fromName} <ChevronRight className="w-5 h-5 text-blue-400" /> {toName}
+                </h1>
+                <p className="text-sm text-gray-400">
+                  {count} {travelType === 'flights' ? 'flights' : 'buses'} · {displayDate}
+                </p>
+              </div>
+            </div>
+          )}
+
+          {travelType === 'hotels' && (
+            <div className="flex items-center gap-3 mb-5">
+              <button
+                onClick={() => router.push('/')}
+                className="p-2 bg-white border border-slate-200 hover:border-[#0770e3] rounded-xl transition-colors shadow-sm"
+                aria-label="Back"
+              >
+                <ArrowLeft className="w-4 h-4 text-slate-600" />
+              </button>
+              <div className="min-w-0">
+                <h1 className="text-xl font-bold text-slate-900 flex items-center gap-2 truncate">
+                  <Building2 className="w-5 h-5 text-[#0770e3]" />
+                  Hotels in {hotelDest || 'your destination'}
+                </h1>
+                <p className="text-sm text-slate-500">
+                  {new Date(checkIn + 'T00:00:00').toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}
+                  {' – '}
+                  {new Date(checkOut + 'T00:00:00').toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}
+                  {' · 2 adults, 1 room'}
+                </p>
+              </div>
+            </div>
+          )}
 
           {travelType === 'flights' ? (
             <FlightSearchResultsView flightResults={dynamicFlightResults} />
+          ) : travelType === 'hotels' ? (
+            <HotelSearchResultsView destination={hotelDest} />
           ) : (
             <BusSearchResultsView
               busResults={dynamicBusResults}

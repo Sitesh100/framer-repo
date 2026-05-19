@@ -10,7 +10,7 @@ import { usePathname } from 'next/navigation';
 
 const navLinks = [
   { name: 'Home', href: '/' },
-  { name: 'Visas', href: '/visa' },
+  // { name: 'Visas', href: '/visa' },
   { name: 'Pricing', href: '/pricing' },
   { name: 'Contact', href: '/contact' },
 ];
@@ -50,7 +50,7 @@ const Header = () => {
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5, ease: 'easeOut' }}
-        className="fixed top-4 left-1/2 -translate-x-1/2 z-[999] w-[calc(100%-2rem)] max-w-6xl"
+        className="fixed top-4 left-1/2 -translate-x-1/2 z-[999] w-[calc(100%-2rem)] max-w-[1440px]"
       >
         <div 
           className={`

@@ -14,7 +14,7 @@ const Homepage = () => {
     <div className="min-h-screen bg-background">
       <Header />
       <main >
-        <div className="hero bg-gradient-to-b from-[#053f30] via-[#064c38] to-[#39d353] ">
+        <div className="hero">
           <Hero />
         </div>
         <div className='max-w-6xl mx-auto'>
