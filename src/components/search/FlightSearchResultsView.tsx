@@ -86,7 +86,7 @@ function AirlineBadge({ airline }: { airline: string }) {
 }
 
 // ── Flight Card (Skyscanner-style) ────────────────────────────
-function FlightCard({ flight }: { flight: FlightResult }) {
+function FlightCard({ flight, onBookFlight }: { flight: FlightResult; onBookFlight?: (flight: FlightResult) => void }) {
   const [expanded, setExpanded] = useState(false);
 
   return (
@@ -157,6 +157,7 @@ function FlightCard({ flight }: { flight: FlightResult }) {
             </div>
 
             <motion.button
+              onClick={() => onBookFlight?.(flight)}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.97 }}
               className="mt-0 md:mt-2 bg-[#0770e3] hover:bg-[#0561c7] text-white font-bold text-sm px-5 py-2.5 rounded-xl transition-colors shadow-md shadow-[#0770e3]/20 whitespace-nowrap flex items-center gap-1.5 justify-center"
@@ -426,7 +427,7 @@ function HotelPromoCard() {
 }
 
 // ── Main Export ───────────────────────────────────────────────
-export default function FlightSearchResultsView({ flightResults }: FlightSearchResultsViewProps) {
+export default function FlightSearchResultsView({ flightResults, onBookFlight }: FlightSearchResultsViewProps) {
   const [showFilters, setShowFilters] = useState(false);
   const [sortBy, setSortBy] = useState<'best' | 'cheapest' | 'fastest'>('best');
   const [filters, setFilters] = useState<FlightFilters>(defaultFlightFilters);

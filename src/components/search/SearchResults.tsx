@@ -3,16 +3,14 @@
 import { useState, useRef, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MapPin, Calendar, ArrowLeftRight, Search, ArrowLeft, Bus, Plane, ChevronRight } from 'lucide-react';
+import { MapPin, ArrowLeftRight, Search, ArrowLeft, Bus, Plane, ChevronRight } from 'lucide-react';
 import Header from '@/components/shared/Header';
 import BusSearchResultsView, { type BusResult } from '@/components/search/BusSearchResultsView';
 import FlightSearchResultsView, { type FlightResult } from '@/components/search/FlightSearchResultsView';
-<<<<<<< HEAD
 import HotelSearchResultsView from '@/components/search/HotelSearchResultsView';
-import { Building2, Users, ChevronDown } from 'lucide-react';
-=======
 import FlightBookingModal from '@/components/search/FlightBookingModal';
->>>>>>> 2b9646f659cbafa048bff3c903667dfa2ec1fe55
+import { Building2, Users, ChevronDown } from 'lucide-react';
+import { DatePicker } from '@/components/ui/date-picker';
 
 const busResults: BusResult[] = [
   {
@@ -714,19 +712,17 @@ function SearchResultsContent() {
                 <CityInput label="To" value={toCity} onChange={setToCity} mode={travelType} />
               </div>
 
-              <div className="flex items-center gap-2 px-4 border-r border-blue-100 flex-shrink-0">
-                <Calendar className="w-4 h-4 text-blue-400" />
+              <div className="flex items-center px-2 border-r border-blue-100 flex-shrink-0">
                 <div>
-                  <p className="text-[10px] font-bold text-blue-500 uppercase tracking-widest">Date</p>
-                  <div className="flex items-center gap-1.5">
-                    <input
-                      type="date"
-                      value={date}
-                      onChange={(e) => setDate(e.target.value)}
-                      className="text-[13px] font-bold text-slate-900 bg-transparent outline-none"
-                    />
-                    {isToday && <span className="text-[10px] text-gray-400">(Today)</span>}
-                  </div>
+                  <p className="text-[10px] font-bold text-blue-500 uppercase tracking-widest pl-2">
+                    Date {isToday && <span className="ml-1 text-gray-400">(Today)</span>}
+                  </p>
+                  <DatePicker
+                    value={date}
+                    onChange={setDate}
+                    triggerClassName="text-[13px] font-bold !text-slate-900 px-2 py-1"
+                    formatStr="dd MMM yyyy"
+                  />
                 </div>
               </div>
 
@@ -778,22 +774,23 @@ function SearchResultsContent() {
               </div>
 
               <div className="flex gap-2 lg:gap-2">
-                <div className="flex-1 lg:w-[140px] bg-white rounded-xl px-4 py-2.5 flex flex-col justify-center">
-                  <span className="text-[11px] font-semibold text-slate-500">Check-in</span>
-                  <input
-                    type="date"
+                <div className="flex-1 lg:w-[160px] bg-white rounded-xl px-3 py-2 flex flex-col justify-center">
+                  <span className="text-[11px] font-semibold text-slate-500 px-1">Check-in</span>
+                  <DatePicker
                     value={checkIn}
-                    onChange={(e) => setCheckIn(e.target.value)}
-                    className="text-[14px] font-semibold text-slate-900 bg-transparent outline-none"
+                    onChange={setCheckIn}
+                    triggerClassName="text-[14px] font-semibold !text-slate-900 px-1"
+                    formatStr="dd MMM yyyy"
                   />
                 </div>
-                <div className="flex-1 lg:w-[140px] bg-white rounded-xl px-4 py-2.5 flex flex-col justify-center">
-                  <span className="text-[11px] font-semibold text-slate-500">Check-out</span>
-                  <input
-                    type="date"
+                <div className="flex-1 lg:w-[160px] bg-white rounded-xl px-3 py-2 flex flex-col justify-center">
+                  <span className="text-[11px] font-semibold text-slate-500 px-1">Check-out</span>
+                  <DatePicker
                     value={checkOut}
-                    onChange={(e) => setCheckOut(e.target.value)}
-                    className="text-[14px] font-semibold text-slate-900 bg-transparent outline-none"
+                    onChange={setCheckOut}
+                    triggerClassName="text-[14px] font-semibold !text-slate-900 px-1"
+                    formatStr="dd MMM yyyy"
+                    minDate={checkIn ? new Date(checkIn) : undefined}
                   />
                 </div>
               </div>
@@ -864,16 +861,12 @@ function SearchResultsContent() {
           )}
 
           {travelType === 'flights' ? (
-<<<<<<< HEAD
-            <FlightSearchResultsView flightResults={dynamicFlightResults} />
-          ) : travelType === 'hotels' ? (
-            <HotelSearchResultsView destination={hotelDest} />
-=======
             <FlightSearchResultsView
               flightResults={dynamicFlightResults}
               onBookFlight={(flight) => setSelectedFlight(flight)}
             />
->>>>>>> 2b9646f659cbafa048bff3c903667dfa2ec1fe55
+          ) : travelType === 'hotels' ? (
+            <HotelSearchResultsView destination={hotelDest} />
           ) : (
             <BusSearchResultsView
               busResults={dynamicBusResults}

@@ -15,6 +15,7 @@ import {
   MapPin,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { DatePicker } from '@/components/ui/date-picker';
 
 import bgFlights from '@/app/assets/santoroni.jpg';
 import bgHotels from '@/app/assets/bali.jpg';
@@ -440,29 +441,18 @@ const Hero = () => {
 
                   {/* Depart */}
                   <Field label="Depart">
-                    <div className="flex items-center gap-2">
-                      <Calendar className="w-4 h-4 text-slate-400 shrink-0" />
-                      <input
-                        type="date"
-                        value={departDate}
-                        onChange={(e) => setDepartDate(e.target.value)}
-                        className="text-[15px] font-semibold text-slate-900 bg-transparent outline-none w-full"
-                      />
-                    </div>
+                    <DatePicker value={departDate} onChange={setDepartDate} placeholder="Add date" />
                   </Field>
 
                   {/* Return (flights + return mode) */}
                   {activeTab === 'flights' && tripType === 'return' && (
                     <Field label="Return">
-                      <div className="flex items-center gap-2">
-                        <Calendar className="w-4 h-4 text-slate-400 shrink-0" />
-                        <input
-                          type="date"
-                          value={returnDate}
-                          onChange={(e) => setReturnDate(e.target.value)}
-                          className="text-[15px] font-semibold text-slate-900 bg-transparent outline-none w-full"
-                        />
-                      </div>
+                      <DatePicker
+                        value={returnDate}
+                        onChange={setReturnDate}
+                        placeholder="Add date"
+                        minDate={departDate ? new Date(departDate) : undefined}
+                      />
                     </Field>
                   )}
 
@@ -535,27 +525,16 @@ const Hero = () => {
                   />
 
                   <Field label="Check-in">
-                    <div className="flex items-center gap-2">
-                      <Calendar className="w-4 h-4 text-slate-400 shrink-0" />
-                      <input
-                        type="date"
-                        value={checkIn}
-                        onChange={(e) => setCheckIn(e.target.value)}
-                        className="text-[15px] font-semibold text-slate-900 bg-transparent outline-none w-full"
-                      />
-                    </div>
+                    <DatePicker value={checkIn} onChange={setCheckIn} placeholder="Add date" />
                   </Field>
 
                   <Field label="Check-out">
-                    <div className="flex items-center gap-2">
-                      <Calendar className="w-4 h-4 text-slate-400 shrink-0" />
-                      <input
-                        type="date"
-                        value={checkOut}
-                        onChange={(e) => setCheckOut(e.target.value)}
-                        className="text-[15px] font-semibold text-slate-900 bg-transparent outline-none w-full"
-                      />
-                    </div>
+                    <DatePicker
+                      value={checkOut}
+                      onChange={setCheckOut}
+                      placeholder="Add date"
+                      minDate={checkIn ? new Date(checkIn) : undefined}
+                    />
                   </Field>
 
                   <Field label="Guests & rooms">
