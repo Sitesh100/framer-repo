@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
-import { Menu, X, Plane, UserPlus } from 'lucide-react';
+import { Menu, X, Plane, UserPlus, User, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import AuthModal from '@/components/auth/AuthModal';
 import Link from 'next/link';
@@ -15,11 +15,32 @@ const navLinks = [
   { name: 'Contact', href: '/contact' },
 ];
 
+type AuthUser = {
+  name: string;
+  email: string;
+  profileImage?: string;
+};
+
+const AUTH_USER_KEY = 'onlyy-auth-user';
+
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authModalView, setAuthModalView] = useState<'login' | 'signup'>('signup');
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const [authUser, setAuthUser] = useState<AuthUser | null>(() => {
+    if (typeof window === 'undefined') return null;
+    const savedUser = window.localStorage.getItem(AUTH_USER_KEY);
+    if (!savedUser) return null;
+    try {
+      return JSON.parse(savedUser) as AuthUser;
+    } catch {
+      window.localStorage.removeItem(AUTH_USER_KEY);
+      return null;
+    }
+  });
+  const profileMenuRef = useRef<HTMLDivElement | null>(null);
   const pathname = usePathname();
 
   useEffect(() => {
@@ -30,6 +51,36 @@ const Header = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (profileMenuRef.current && !profileMenuRef.current.contains(event.target as Node)) {
+        setIsProfileMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    const syncAuthFromStorage = () => {
+      const savedUser = localStorage.getItem(AUTH_USER_KEY);
+      if (!savedUser) {
+        setAuthUser(null);
+        return;
+      }
+      try {
+        setAuthUser(JSON.parse(savedUser) as AuthUser);
+      } catch {
+        localStorage.removeItem(AUTH_USER_KEY);
+        setAuthUser(null);
+      }
+    };
+
+    window.addEventListener('auth-changed', syncAuthFromStorage);
+    return () => window.removeEventListener('auth-changed', syncAuthFromStorage);
+  }, []);
+
   const openSignup = () => {
     setAuthModalView('signup');
     setIsAuthModalOpen(true);
@@ -38,6 +89,20 @@ const Header = () => {
   const openLogin = () => {
     setAuthModalView('login');
     setIsAuthModalOpen(true);
+  };
+
+  const handleAuthSuccess = (user: AuthUser) => {
+    setAuthUser(user);
+    localStorage.setItem(AUTH_USER_KEY, JSON.stringify(user));
+    setIsProfileMenuOpen(false);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem(AUTH_USER_KEY);
+    window.dispatchEvent(new Event('auth-changed'));
+    setAuthUser(null);
+    setIsProfileMenuOpen(false);
+    setIsMenuOpen(false);
   };
 
   const isLinkActive = (href: string) => {
@@ -52,13 +117,13 @@ const Header = () => {
         transition={{ duration: 0.5, ease: 'easeOut' }}
         className="fixed top-4 left-1/2 -translate-x-1/2 z-[999] w-[calc(100%-2rem)] max-w-[1440px]"
       >
-        <div 
+        <div
           className={`
-            rounded-2xl 
+            rounded-2xl
             transition-all duration-300 ease-out
             bg-white/95 backdrop-blur-xl border border-gray-200/80
-            ${isScrolled 
-              ? 'shadow-xl shadow-blue-500/5' 
+            ${isScrolled
+              ? 'shadow-xl shadow-blue-500/5'
               : 'shadow-lg'
             }
           `}
@@ -75,7 +140,7 @@ const Header = () => {
                 >
                   <Plane className="w-5 h-5 text-white" />
                 </motion.div>
-                <span 
+                <span
                   className="text-xl lg:text-2xl font-serif font-bold bg-clip-text text-transparent"
                   style={{ backgroundImage: 'linear-gradient(135deg, #2563eb 0%, #0891b2 100%)' }}
                 >
@@ -102,23 +167,88 @@ const Header = () => {
                 )})}
               </nav>
 
-              {/* Auth Buttons */}
+              {/* Desktop Auth/Profile */}
               <div className="hidden lg:flex items-center gap-3">
-                <Button 
-                  variant="ghost"
-                  onClick={openLogin}
-                  className="text-gray-600 hover:text-blue-600 hover:bg-blue-50 font-medium"
-                >
-                  Login
-                </Button>
-                <Button 
-                  onClick={openSignup}
-                  className="rounded-full text-white font-semibold px-5 border-0 shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
-                  style={{ background: 'linear-gradient(135deg, #2563eb 0%, #0891b2 100%)' }}
-                >
-                  <UserPlus className="w-4 h-4 mr-2" />
-                  Sign Up
-                </Button>
+                {authUser ? (
+                  <div className="relative" ref={profileMenuRef}>
+                    <button
+                      onClick={() => setIsProfileMenuOpen((prev) => !prev)}
+                      className="flex items-center gap-2 rounded-full border border-gray-200 bg-white px-2 py-1 pr-3 hover:border-blue-200 hover:bg-blue-50 transition-colors"
+                      aria-label="Account menu"
+                    >
+                      <div className="w-9 h-9 rounded-full overflow-hidden bg-gray-100 flex items-center justify-center border border-gray-200">
+                        {authUser.profileImage ? (
+                          <img
+                            src={authUser.profileImage}
+                            alt="Profile"
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <User className="w-5 h-5 text-gray-500" />
+                        )}
+                      </div>
+                      <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform ${isProfileMenuOpen ? 'rotate-180' : ''}`} />
+                    </button>
+
+                    <AnimatePresence>
+                      {isProfileMenuOpen && (
+                        <motion.div
+                          initial={{ opacity: 0, y: 8 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: 8 }}
+                          transition={{ duration: 0.18 }}
+                          className="absolute right-0 mt-2 w-56 rounded-xl border border-gray-200 bg-white p-2 shadow-xl"
+                        >
+                          <Link
+                            href="/personal-information"
+                            onClick={() => setIsProfileMenuOpen(false)}
+                            className="block w-full text-left px-3 py-2 text-sm rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors"
+                          >
+                            Personal Information
+                          </Link>
+                          <Link
+                            href="/previous-trip"
+                            onClick={() => setIsProfileMenuOpen(false)}
+                            className="block w-full text-left px-3 py-2 text-sm rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors"
+                          >
+                            Previous Trip
+                          </Link>
+                          <Link
+                            href="/wallet"
+                            onClick={() => setIsProfileMenuOpen(false)}
+                            className="block w-full text-left px-3 py-2 text-sm rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors"
+                          >
+                            Onlyy Wallet
+                          </Link>
+                          <button
+                            onClick={handleLogout}
+                            className="block w-full text-left px-3 py-2 text-sm rounded-lg text-red-600 hover:bg-red-50 transition-colors"
+                          >
+                            Logout
+                          </button>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                ) : (
+                  <>
+                    <Button
+                      variant="ghost"
+                      onClick={openLogin}
+                      className="text-gray-600 hover:text-blue-600 hover:bg-blue-50 font-medium"
+                    >
+                      Login
+                    </Button>
+                    <Button
+                      onClick={openSignup}
+                      className="rounded-full text-white font-semibold px-5 border-0 shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
+                      style={{ background: 'linear-gradient(135deg, #2563eb 0%, #0891b2 100%)' }}
+                    >
+                      <UserPlus className="w-4 h-4 mr-2" />
+                      Sign Up
+                    </Button>
+                  </>
+                )}
               </div>
 
               {/* Mobile Menu Toggle */}
@@ -167,27 +297,74 @@ const Header = () => {
                     </motion.div>
                   )})}
                   <div className="mt-3 pt-3 border-t border-gray-100 space-y-2">
-                    <Button 
-                      variant="outline"
-                      onClick={() => {
-                        setIsMenuOpen(false);
-                        openLogin();
-                      }}
-                      className="w-full rounded-xl font-medium"
-                    >
-                      Login
-                    </Button>
-                    <Button 
-                      onClick={() => {
-                        setIsMenuOpen(false);
-                        openSignup();
-                      }}
-                      className="w-full rounded-xl text-white font-semibold border-0"
-                      style={{ background: 'linear-gradient(135deg, #2563eb 0%, #0891b2 100%)' }}
-                    >
-                      <UserPlus className="w-4 h-4 mr-2" />
-                      Sign Up
-                    </Button>
+                    {authUser ? (
+                      <>
+                        <div className="flex items-center gap-3 px-2 py-2">
+                          <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-100 flex items-center justify-center border border-gray-200">
+                            {authUser.profileImage ? (
+                              <img src={authUser.profileImage} alt="Profile" className="w-full h-full object-cover" />
+                            ) : (
+                              <User className="w-5 h-5 text-gray-500" />
+                            )}
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-sm font-semibold text-gray-800 truncate">{authUser.name || 'Account'}</p>
+                            <p className="text-xs text-gray-500 truncate">{authUser.email}</p>
+                          </div>
+                        </div>
+                        <Link
+                          href="/personal-information"
+                          onClick={() => setIsMenuOpen(false)}
+                          className="block w-full text-left rounded-xl font-medium px-4 py-2.5 text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors"
+                        >
+                          Personal Information
+                        </Link>
+                        <Link
+                          href="/previous-trip"
+                          onClick={() => setIsMenuOpen(false)}
+                          className="block w-full text-left rounded-xl font-medium px-4 py-2.5 text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors"
+                        >
+                          Previous Trip
+                        </Link>
+                        <Link
+                          href="/wallet"
+                          onClick={() => setIsMenuOpen(false)}
+                          className="block w-full text-left rounded-xl font-medium px-4 py-2.5 text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors"
+                        >
+                          Onlyy Wallet
+                        </Link>
+                        <button
+                          onClick={handleLogout}
+                          className="w-full text-left rounded-xl font-medium px-4 py-2.5 text-red-600 hover:bg-red-50 transition-colors"
+                        >
+                          Logout
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <Button
+                          variant="outline"
+                          onClick={() => {
+                            setIsMenuOpen(false);
+                            openLogin();
+                          }}
+                          className="w-full rounded-xl font-medium"
+                        >
+                          Login
+                        </Button>
+                        <Button
+                          onClick={() => {
+                            setIsMenuOpen(false);
+                            openSignup();
+                          }}
+                          className="w-full rounded-xl text-white font-semibold border-0"
+                          style={{ background: 'linear-gradient(135deg, #2563eb 0%, #0891b2 100%)' }}
+                        >
+                          <UserPlus className="w-4 h-4 mr-2" />
+                          Sign Up
+                        </Button>
+                      </>
+                    )}
                   </div>
                 </nav>
               </motion.div>
@@ -197,10 +374,11 @@ const Header = () => {
       </motion.header>
 
       {/* Auth Modal */}
-      <AuthModal 
-        isOpen={isAuthModalOpen} 
+      <AuthModal
+        isOpen={isAuthModalOpen}
         onClose={() => setIsAuthModalOpen(false)}
         initialView={authModalView}
+        onAuthSuccess={handleAuthSuccess}
       />
     </>
   );

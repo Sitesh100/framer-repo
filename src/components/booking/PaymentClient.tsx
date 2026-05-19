@@ -26,6 +26,8 @@ interface BookingData {
   discount: number;
   seats: string[];
   passengers: any[];
+  flexiAmount?: number;
+  flexiSelected?: boolean;
   totalPrice: number;
 }
 
@@ -77,6 +79,7 @@ export default function PaymentClient() {
   }
 
   const totalAmount = bookingData.totalPrice;
+  const flexiAmount = bookingData.flexiAmount ?? 0;
 
   const handleCardInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -443,6 +446,12 @@ export default function PaymentClient() {
                       <span>Passengers</span>
                       <span className="font-semibold">{bookingData.passengers.length}</span>
                     </div>
+                    {flexiAmount > 0 && (
+                      <div className="flex justify-between">
+                        <span>Flexi Protect</span>
+                        <span className="font-semibold">₹{flexiAmount}</span>
+                      </div>
+                    )}
                     <div className="flex justify-between pt-2 border-t border-gray-100">
                       <span className="font-bold">Total</span>
                       <span className="font-bold text-blue-600">₹{totalAmount}</span>
@@ -509,12 +518,18 @@ export default function PaymentClient() {
               <div className="text-sm text-gray-700 space-y-2">
                 <div className="flex justify-between">
                   <span>Base Fare</span>
-                  <span>₹{bookingData.originalPrice}</span>
+                  <span>₹{bookingData.seats.length * bookingData.originalPrice}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Discount</span>
-                  <span className="text-green-600">-₹{bookingData.discount}</span>
+                  <span className="text-green-600">-₹{bookingData.seats.length * (bookingData.originalPrice - bookingData.discountedPrice)}</span>
                 </div>
+                {flexiAmount > 0 && (
+                  <div className="flex justify-between">
+                    <span>Flexi Protect</span>
+                    <span>₹{flexiAmount}</span>
+                  </div>
+                )}
                 <div className="flex justify-between font-bold pt-2 border-t border-gray-100">
                   <span>Total</span>
                   <span className="text-blue-600">₹{totalAmount}</span>

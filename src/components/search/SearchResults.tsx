@@ -7,8 +7,12 @@ import { MapPin, Calendar, ArrowLeftRight, Search, ArrowLeft, Bus, Plane, Chevro
 import Header from '@/components/shared/Header';
 import BusSearchResultsView, { type BusResult } from '@/components/search/BusSearchResultsView';
 import FlightSearchResultsView, { type FlightResult } from '@/components/search/FlightSearchResultsView';
+<<<<<<< HEAD
 import HotelSearchResultsView from '@/components/search/HotelSearchResultsView';
 import { Building2, Users, ChevronDown } from 'lucide-react';
+=======
+import FlightBookingModal from '@/components/search/FlightBookingModal';
+>>>>>>> 2b9646f659cbafa048bff3c903667dfa2ec1fe55
 
 const busResults: BusResult[] = [
   {
@@ -612,6 +616,7 @@ function SearchResultsContent() {
   const [checkIn, setCheckIn] = useState(urlCheckin || new Date().toISOString().split('T')[0]);
   const [checkOut, setCheckOut] = useState(urlCheckout || tomorrow());
   const [isBusModalOpen, setIsBusModalOpen] = useState(false);
+  const [selectedFlight, setSelectedFlight] = useState<FlightResult | null>(null);
 
   useEffect(() => {
     setFromCity(urlFrom || '');
@@ -622,7 +627,7 @@ function SearchResultsContent() {
     if (urlCheckout) setCheckOut(urlCheckout);
   }, [currentType, urlFrom, urlTo, urlDate, urlDestination, urlCheckin, urlCheckout]);
 
-  const hideTopChrome = travelType === 'bus' && isBusModalOpen;
+  const hideTopChrome = (travelType === 'bus' && isBusModalOpen) || !!selectedFlight;
 
   const getTodayDate = () => new Date().toISOString().split('T')[0];
   const getTomorrowDate = () => {
@@ -859,9 +864,16 @@ function SearchResultsContent() {
           )}
 
           {travelType === 'flights' ? (
+<<<<<<< HEAD
             <FlightSearchResultsView flightResults={dynamicFlightResults} />
           ) : travelType === 'hotels' ? (
             <HotelSearchResultsView destination={hotelDest} />
+=======
+            <FlightSearchResultsView
+              flightResults={dynamicFlightResults}
+              onBookFlight={(flight) => setSelectedFlight(flight)}
+            />
+>>>>>>> 2b9646f659cbafa048bff3c903667dfa2ec1fe55
           ) : (
             <BusSearchResultsView
               busResults={dynamicBusResults}
@@ -873,6 +885,16 @@ function SearchResultsContent() {
           )}
         </div>
       </div>
+
+      {selectedFlight && (
+        <FlightBookingModal
+          flight={selectedFlight}
+          fromCity={fromName}
+          toCity={toName}
+          travelDate={displayDate}
+          onClose={() => setSelectedFlight(null)}
+        />
+      )}
     </>
   );
 }

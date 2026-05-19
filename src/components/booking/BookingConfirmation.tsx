@@ -40,6 +40,8 @@ interface BookingData {
   passengers: PassengerInfo[];
   selectedSeats: string[];
   travelDate: string;
+  flexiAmount?: number;
+  flexiSelected?: boolean;
 }
 
 interface BookingConfirmationProps {
@@ -65,13 +67,14 @@ export default function BookingConfirmation({
   const [termsAccepted, setTermsAccepted] = useState(false);
 
   const totalPrice = bookingData.selectedSeats.length * bookingData.discountedPrice;
+  const flexiAmount = bookingData.flexiAmount ?? 0;
   const savedAmount = bookingData.selectedSeats.length * (bookingData.originalPrice - bookingData.discountedPrice);
-  let finalPrice = totalPrice;
+  let finalPrice = totalPrice + flexiAmount;
   let promoDiscount = 0;
 
   if (appliedPromo) {
     promoDiscount = Math.floor(totalPrice * (appliedPromo.discount / 100));
-    finalPrice = totalPrice - promoDiscount;
+    finalPrice = totalPrice - promoDiscount + flexiAmount;
   }
 
   const handleApplyPromo = () => {
@@ -381,6 +384,12 @@ export default function BookingConfirmation({
                   <span className="text-gray-700">Subtotal</span>
                   <span className="font-semibold text-slate-900">₹{totalPrice}</span>
                 </div>
+                {flexiAmount > 0 && (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-700">Flexi Protect</span>
+                    <span className="font-semibold text-slate-900">₹{flexiAmount}</span>
+                  </div>
+                )}
 
                 {appliedPromo && (
                   <div className="flex justify-between text-sm">

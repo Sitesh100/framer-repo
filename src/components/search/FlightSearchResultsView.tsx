@@ -72,6 +72,7 @@ const defaultFlightFilters: FlightFilters = {
 
 interface FlightSearchResultsViewProps {
   flightResults: FlightResult[];
+  onBookFlight?: (flight: FlightResult) => void;
 }
 
 // ── Airline Badge (initials in blue/white) ────────────────────
@@ -593,7 +594,7 @@ export default function FlightSearchResultsView({ flightResults }: FlightSearchR
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: Math.min(idx * 0.04, 0.3) }}
               >
-                <FlightCard flight={flight} />
+                <FlightCard flight={flight} onBookFlight={onBookFlight} />
               </motion.div>
             ))}
           </div>

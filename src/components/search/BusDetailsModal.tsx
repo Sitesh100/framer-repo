@@ -6,8 +6,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   X, ChevronRight, ChevronLeft, Star, Wifi, Zap, Coffee,
   Wind, MapPin, Clock, Shield, AlertCircle, Users,
-  Package, PawPrint, Beer, Bus, CheckCircle2, TrendingDown,
+  Package, PawPrint, Beer, Bus, CheckCircle2, TrendingDown, CircleX,
 } from 'lucide-react';
+import AuthModal from '@/components/auth/AuthModal';
 
 // ── Types ─────────────────────────────────────────────────────
 export interface BusModalProps {
@@ -171,6 +172,26 @@ type Tab = typeof TABS[number];
 type Step = 'info' | 'seats' | 'boardpoint' | 'passenger';
 
 interface PassengerData { name: string; age: string; gender: string; email: string }
+type PaymentPayload = {
+  busName: string;
+  from: string;
+  to: string;
+  departure: string;
+  arrival: string;
+  duration: string;
+  originalPrice: number;
+  discountedPrice: number;
+  boardingPoint: string;
+  droppingPoint: string;
+  seats: string[];
+  passengers: PassengerData[];
+  flexiAmount: number;
+  flexiSelected: boolean;
+  totalPrice: number;
+};
+
+const AUTH_USER_KEY = 'onlyy-auth-user';
+const FLEXI_FEE = 99;
 
 export default function BusDetailsModal({ bus, onClose }: BusModalProps) {
   const router = useRouter();
@@ -184,6 +205,9 @@ export default function BusDetailsModal({ bus, onClose }: BusModalProps) {
   const [boarding, setBoarding]   = useState('');
   const [dropping, setDropping]   = useState('');
   const [passengers, setPassengers] = useState<Record<string, PassengerData>>({});
+  const [isFlexiSelected, setIsFlexiSelected] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [pendingPaymentData, setPendingPaymentData] = useState<PaymentPayload | null>(null);
   const tabScrollRef = useRef<HTMLDivElement>(null);
 
   const lowerSeats = seats.filter(s => s.deck === 'lower');
@@ -201,25 +225,44 @@ export default function BusDetailsModal({ bus, onClose }: BusModalProps) {
   };
 
   const selectedArr = Array.from(selected);
-  const totalPrice  = selectedArr.length * bus.discountedPrice;
+  const seatTotalPrice = selectedArr.length * bus.discountedPrice;
+  const flexiAmount = isFlexiSelected ? FLEXI_FEE : 0;
+  const totalPrice  = seatTotalPrice + flexiAmount;
   const savedAmt    = selectedArr.length * (bus.originalPrice - bus.discountedPrice);
 
   const setPassenger = (seat: string, field: keyof PassengerData, val: string) =>
     setPassengers(p => ({ ...p, [seat]: { ...p[seat], [field]: val } as PassengerData }));
 
+  const isAuthenticated = () => {
+    if (typeof window === 'undefined') return false;
+    const savedUser = window.localStorage.getItem(AUTH_USER_KEY);
+    return !!savedUser;
+  };
+
+  const goToPayment = (data: PaymentPayload) => {
+    router.push(`/booking/payment?data=${encodeURIComponent(JSON.stringify(data))}`);
+    onClose();
+  };
+
   const handlePay = () => {
     const allOk = selectedArr.every(s => passengers[s]?.name && passengers[s]?.age && passengers[s]?.gender && passengers[s]?.email);
     if (!allOk) { alert('Please fill in all passenger details'); return; }
-    const data = {
+    const data: PaymentPayload = {
       busName: bus.name, from: bus.fromCity, to: bus.toCity,
       departure: bus.departure, arrival: bus.arrival, duration: bus.duration,
       originalPrice: bus.originalPrice, discountedPrice: bus.discountedPrice,
       boardingPoint: boarding, droppingPoint: dropping,
-      seats: selectedArr, passengers: selectedArr.map(s => passengers[s]),
+      seats: selectedArr, passengers: selectedArr.map(s => passengers[s]!),
+      flexiAmount,
+      flexiSelected: isFlexiSelected,
       totalPrice,
     };
-    router.push(`/booking/payment?data=${encodeURIComponent(JSON.stringify(data))}`);
-    onClose();
+    if (!isAuthenticated()) {
+      setPendingPaymentData(data);
+      setIsAuthModalOpen(true);
+      return;
+    }
+    goToPayment(data);
   };
 
   // ── Seat grid ───────────────────────────────────────────────
@@ -342,7 +385,27 @@ export default function BusDetailsModal({ bus, onClose }: BusModalProps) {
                 <p className="text-[13px] font-bold text-blue-900">Add Flexi Protect — ₹99</p>
                 <p className="text-[12px] text-blue-700 mt-0.5">Upgrade to 100% refund on cancellation anytime before departure.</p>
               </div>
-              <button className="ml-auto text-[12px] font-bold text-blue-600 border border-blue-300 px-3 py-1.5 rounded-lg hover:bg-blue-100 transition-colors whitespace-nowrap bg-white">Add</button>
+              <div className="ml-auto flex items-center gap-2">
+                <button
+                  onClick={() => setIsFlexiSelected((prev) => !prev)}
+                  className={`text-[12px] font-bold border px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap ${
+                    isFlexiSelected
+                      ? 'text-white bg-blue-600 border-blue-600 hover:bg-blue-700'
+                      : 'text-blue-600 border-blue-300 hover:bg-blue-100 bg-white'
+                  }`}
+                >
+                  {isFlexiSelected ? 'Added' : 'Add'}
+                </button>
+                {isFlexiSelected && (
+                  <button
+                    onClick={() => setIsFlexiSelected(false)}
+                    aria-label="Remove Flexi Protect"
+                    className="w-8 h-8 rounded-lg border border-red-200 bg-white text-red-600 hover:bg-red-50 transition-colors flex items-center justify-center"
+                  >
+                    <CircleX className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
             </div>
 
             <p className="text-[11px] text-gray-500 mt-3 leading-relaxed">
@@ -844,6 +907,9 @@ export default function BusDetailsModal({ bus, onClose }: BusModalProps) {
                   <span className="text-lg font-black text-blue-600">₹{totalPrice}</span>
                   {savedAmt > 0 && <span className="text-[11px] text-emerald-600 font-semibold">Save ₹{savedAmt}</span>}
                 </div>
+                {isFlexiSelected && (
+                  <p className="text-[11px] text-blue-600 font-medium">Includes Flexi Protect ₹{FLEXI_FEE}</p>
+                )}
               </div>
             )}
 
@@ -869,6 +935,21 @@ export default function BusDetailsModal({ bus, onClose }: BusModalProps) {
           </div>
         </motion.div>
       </motion.div>
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        initialView="login"
+        onAuthSuccess={() => {
+          if (pendingPaymentData) {
+            const data = pendingPaymentData;
+            setPendingPaymentData(null);
+            setIsAuthModalOpen(false);
+            goToPayment(data);
+            return;
+          }
+          setIsAuthModalOpen(false);
+        }}
+      />
     </AnimatePresence>
   );
 }

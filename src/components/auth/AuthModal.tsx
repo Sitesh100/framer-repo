@@ -51,9 +51,12 @@ interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
   initialView?: 'login' | 'signup';
+  onAuthSuccess?: (user: { name: string; email: string; profileImage?: string }) => void;
 }
 
-const AuthModal = ({ isOpen, onClose, initialView = 'signup' }: AuthModalProps) => {
+const AUTH_USER_KEY = 'onlyy-auth-user';
+
+const AuthModal = ({ isOpen, onClose, initialView = 'signup', onAuthSuccess }: AuthModalProps) => {
   const [activeView, setActiveView] = useState<'login' | 'signup'>(initialView);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [showPassword, setShowPassword] = useState(false);
@@ -111,11 +114,27 @@ const AuthModal = ({ isOpen, onClose, initialView = 'signup' }: AuthModalProps) 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     console.log('Login:', loginForm);
+    const user = {
+      name: loginForm.email.split('@')[0] || 'Traveler',
+      email: loginForm.email,
+    };
+    localStorage.setItem(AUTH_USER_KEY, JSON.stringify(user));
+    window.dispatchEvent(new Event('auth-changed'));
+    onAuthSuccess?.(user);
+    onClose();
   };
 
   const handleSignup = (e: React.FormEvent) => {
     e.preventDefault();
     console.log('Signup:', signupForm);
+    const user = {
+      name: signupForm.name,
+      email: signupForm.email,
+    };
+    localStorage.setItem(AUTH_USER_KEY, JSON.stringify(user));
+    window.dispatchEvent(new Event('auth-changed'));
+    onAuthSuccess?.(user);
+    onClose();
   };
 
   if (!isOpen) return null;
@@ -565,7 +584,7 @@ const AuthModal = ({ isOpen, onClose, initialView = 'signup' }: AuthModalProps) 
 
                           {/* Sign up link */}
                           <p className="text-center text-sm text-gray-600">
-                            Don't have an account?{' '}
+                            Don&apos;t have an account?{' '}
                             <button
                               type="button"
                               onClick={() => setActiveView('signup')}
